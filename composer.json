@@ -9,7 +9,9 @@
       "email": "schtr4jh@schtr4jh.net"
     }
   ],
-  "require": {},
+  "require": {
+    "swiftmailer/swiftmailer": "dev-master"
+  },
   "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
