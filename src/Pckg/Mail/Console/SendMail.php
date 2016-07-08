@@ -6,7 +6,8 @@ use Pckg\Mail\Service\Mail;
 class SendMail extends Command
 {
 
-    protected function configure() {
+    protected function configure()
+    {
         $this->setName('mail:send')
              ->setDescription('Send an email')
              ->addOptions(
@@ -18,7 +19,8 @@ class SendMail extends Command
              );
     }
 
-    public function handle(Mail $mailService) {
+    public function handle(Mail $mailService)
+    {
     }
 
 }
