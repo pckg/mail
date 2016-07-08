@@ -3,7 +3,7 @@
 use Pckg\Framework\Provider;
 use Pckg\Mail\Console\SendMail;
 
-class Config extends Provider
+class Mail extends Provider
 {
 
     public function consoles() {
