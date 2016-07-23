@@ -1,0 +1,82 @@
+<script>
+    $(document).ready(function(e) {
+        //validates form for e-news signup
+        $("#enews-form").validationEngine('attach',{scroll: false, onValidationComplete: function(form, status) {
+            if(status) {
+                var form = "#enews-form";
+
+                //disable sending button and replace text
+                $(form + " .button").val('{{ __('status_sending') }}').prop('disabled', true);
+
+                //remove any previous alert boxes
+                $(".form-newsletter .alert-danger").remove();
+
+                //post data
+                $.post("/add-mailchimp", $(form).serialize(), function(data){
+                    //recieve data
+                    data = fromJSON(data);
+
+                    //added successfully
+                    if (data.success != false) {
+                        $(form).slideUp();
+                        $(".form-newsletter .alert-success").slideDown();
+                    }
+                    //unable to add user
+                    else {
+                        //change button to resend
+                        $(form + " .button").prop('disabled', false).val('{{ __('btn_resend') }}');
+
+                        if(data.code == 214)
+                            $(form).slideUp();
+
+                        if(data.text)
+                            message = data.text;
+                        else
+                            message = '{{ __('notice_something_went_wrong') }}';
+
+                        var alertbox = $("<div class='alert alert-danger'>" + message + "</div>").hide();
+                        alertbox.appendTo($(".form-newsletter")).slideDown();
+                    }
+                });
+            }
+        }});
+    });
+</script>
+<script language="javascript" src="/js/jquery.parallax2.js"></script>
+<script>
+    $(document).ready(function(e) {
+        $('#parallax').parallax();
+    });
+</script>
+<div class="newsletter-opt-in newsletter-homepage" id="newsletter-opt-in">
+    <div class="clearfix"></div>
+    <ul id="parallax" class="parallax">
+        <li class="layer2" data-depth="0.07"><img src="/img/homepage-newsletter-parallex/last.jpg" ></li>
+        <li class="layer2" data-depth="0.13"><img src="/img/homepage-newsletter-parallex/middle.png" ></li>
+        <li class="layer2" data-depth="0.21"><img src="/img/homepage-newsletter-parallex/first.png" ></li>
+    </ul>
+    <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 form-container">
+        <div class="form-inner-container">
+            <h2>{{ __('heading_e-news') }}</h2>
+
+            <div class="nl-intro">
+                {{ __('text_e-news_index') }}
+            </div>
+
+            <div class="form-newsletter">
+                <form id="enews-form" name="enews-form">
+                    <div class="the-cloud" data-cloud-descr="{{ __('placeholder_email') }}" data-cloud-type="input">
+                        <input class="validate[required,custom[email]]" id="email" name="email" placeholder="{{ __('placeholder_email') }}" type="email" />
+                    </div>
+                    <div>
+                        <input class="button small" id="submitButton" type="submit" value="{{ __('btn_mailchimp_send') }}" />
+                    </div>
+                </form>
+                <div class="alert alert-success">
+                    {{ __('mailchimp_success_index') }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
