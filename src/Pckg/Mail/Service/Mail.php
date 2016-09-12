@@ -1,5 +1,7 @@
 <?php namespace Pckg\Mail\Service;
 
+use Gnp\Mail\Entity\Mails;
+use Pckg\Framework\View\Twig;
 use Swift_Attachment;
 use Swift_Mailer;
 use Swift_MailTransport;
@@ -56,6 +58,19 @@ class Mail
 
     }
 
+    public function template($template, $data = [])
+    {
+        $email = (new Mails())->where('identifier', $template)
+                              ->oneOrFail();
+
+        $body = (new Twig(null, $data))->setTemplate($email->content)->autoparse();
+        $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
+
+        $this->body($body)->subject($subject)->from($email->sender);
+
+        return $this;
+    }
+
     public function plainBody($body)
     {
         $this->mail->addPart($body, 'text/plain');
@@ -64,9 +79,10 @@ class Mail
 
     }
 
-    public function attach($path, $mimeType = null, $name = null)
+    public function attach($path, $mimeType = null, $name = null, $root = 'root')
     {
-        $this->mail->attach(Swift_Attachment::fromPath(path('root') . $path, $mimeType)->setFilename($name));
+        $dir = $root ? path($root) : '';
+        $this->mail->attach(Swift_Attachment::fromPath($dir . $path, $mimeType)->setFilename($name));
 
         return $this;
     }
