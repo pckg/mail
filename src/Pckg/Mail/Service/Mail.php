@@ -63,8 +63,28 @@ class Mail
         $email = (new Mails())->where('identifier', $template)
                               ->oneOrFail();
 
-        $body = (new Twig(null, $data))->setTemplate($email->content)->autoparse();
+        $url = 'https://' . context()->getOrDefault('platformName') . '/';
         $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
+
+        $body = (new Twig(null, $data))->setTemplate(
+            '<html>
+	<head>
+		<title>' . strip_tags($subject) . '</title>
+	</head>
+	<body style="margin: 0; background: #f2f2f2; font-family: Arial, sans-serif; font-size: 16px; padding:25px;">
+		<div style="width: 600px; margin: 0 auto; clear: both;">
+			<a href="#" target="_blank"><img src="' . $url . 'img/logotip-pdf.png" /></a>
+			
+			<span style="display: block; clear: both; height: auto; font-size: 24px; margin: 0 auto; text-transform: uppercase; font-weight:bold;">' . $subject . '</span>
+			<span style="display: block; clear: both; height: 1px; background: #c7c7c7; margin:10px 0 20px;"></span>
+			' . $email->content . '
+			
+			<span style="display: block; clear: both; height: 1px; background: #c7c7c7; margin-top:10px; margin-bottom:20px;"></span>
+			' . __('mail_content_footer') . '
+		</div>
+	</body>
+</html>'
+        )->autoparse();
 
         $this->body($body)->subject($subject)->from($email->sender);
 
