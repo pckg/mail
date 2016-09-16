@@ -20,7 +20,6 @@ class SendMail extends Command
                      'template' => 'Template slug',
                      'user'     => 'User id',
                      'data'     => 'Template data',
-                     'platform' => 'Platform',
                  ],
                  InputOption::VALUE_REQUIRED
              );
