@@ -22,6 +22,11 @@ class SendMail extends Command
                      'data'     => 'Template data',
                  ],
                  InputOption::VALUE_REQUIRED
+             )
+             ->addOptions(
+                 [
+                     'template-required' => '',
+                 ]
              );
     }
 
@@ -47,7 +52,15 @@ class SendMail extends Command
         /**
          * Get user.
          */
-        $user = (new Users())->where('id', $userId)->oneOrFail();
+        if (is_array($userId)) {
+            $entity = array_keys($userId)[0];
+            $id = $userId[$entity];
+            $user = (new $entity)->where('id', $id)->oneOrFail();
+
+        } else {
+            $user = (new Users())->where('id', $userId)->oneOrFail();
+
+        }
 
         /**
          * Create mail template, body, subject, receiver.
