@@ -53,8 +53,9 @@ class SendMail extends Command
          *
          * @T00D00 - Implement
          */
-        $entity = array_keys($userId)[0];
-        $id = $userId[$entity];
+        $jsonUserId = (array)json_decode($userId);
+        $entity = array_keys($jsonUserId)[0];
+        $id = $jsonUserId[$entity];
         $user = (new $entity)->where('id', $id)->oneOrFail();
 
         /**
