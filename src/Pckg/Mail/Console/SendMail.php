@@ -1,7 +1,6 @@
 <?php namespace Pckg\Mail\Console;
 
 use Exception;
-use Pckg\Auth\Entity\Users;
 use Pckg\Database\Repository;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
@@ -51,16 +50,12 @@ class SendMail extends Command
 
         /**
          * Get user.
+         *
+         * @T00D00 - Implement
          */
-        if (is_array($userId)) {
-            $entity = array_keys($userId)[0];
-            $id = $userId[$entity];
-            $user = (new $entity)->where('id', $id)->oneOrFail();
-
-        } else {
-            $user = (new Users())->where('id', $userId)->oneOrFail();
-
-        }
+        $entity = array_keys($userId)[0];
+        $id = $userId[$entity];
+        $user = (new $entity)->where('id', $id)->oneOrFail();
 
         /**
          * Create mail template, body, subject, receiver.
