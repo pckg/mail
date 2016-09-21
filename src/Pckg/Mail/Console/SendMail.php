@@ -4,6 +4,7 @@ use Exception;
 use Pckg\Database\Repository;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
+use Pckg\Mail\Service\Mail\Adapter\Recipient;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -32,7 +33,7 @@ class SendMail extends Command
     public function handle(Mail $mailService)
     {
         $template = $this->option('template');
-        $userId = $this->option('user');
+        $user = $this->option('user');
         $data = (array)json_decode($this->option('data'));
         $realData = $data['data'] ?? [];
 
@@ -51,18 +52,15 @@ class SendMail extends Command
         /**
          * Get user.
          *
-         * @T00D00 - Implement
+         * @var Recipient
          */
-        $jsonUserId = (array)json_decode($userId);
-        $entity = array_keys($jsonUserId)[0];
-        $id = $jsonUserId[$entity];
-        $user = (new $entity)->where('id', $id)->oneOrFail();
+        $user = unserialize($user);
 
         /**
          * Create mail template, body, subject, receiver.
          */
         $mailService->template($template, $realData)
-                    ->to($user->email, $user->name . ' ' . $user->surname);
+                    ->to($user->getEmail(), $user->getFullName());
 
         /**
          * Add attachments.
