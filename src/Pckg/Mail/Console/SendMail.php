@@ -54,7 +54,7 @@ class SendMail extends Command
          *
          * @var Recipient
          */
-        $user = unserialize($user);
+        $user = unserialize(str_replace('[NULLX00NULL]', "\x00", $user));
 
         /**
          * Create mail template, body, subject, receiver.
