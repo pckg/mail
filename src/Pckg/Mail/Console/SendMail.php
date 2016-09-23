@@ -35,7 +35,10 @@ class SendMail extends Command
         $template = $this->option('template');
         $user = $this->option('user');
         $data = (array)json_decode($this->option('data'), true);
-        $realData = $data['data'] ?: [];
+        $realData = [];
+        if (!empty($data['data'])) {
+            $realData = $data['data'];
+        }
 
         /**
          * Fetch required data.
