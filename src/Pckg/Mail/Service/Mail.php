@@ -35,6 +35,13 @@ class Mail
         return $this;
     }
 
+    public function sender($email, $name = null)
+    {
+        $this->mail->setSender($email, $name);
+
+        return $this;
+    }
+
     public function to($email, $name = null)
     {
         $this->mail->addTo($email, $name);
@@ -87,7 +94,7 @@ class Mail
 </html>'
         )->autoparse();
 
-        $this->body($body)->subject($subject)->from($email->sender);
+        $this->body($body)->subject($subject)->from($email->sender)->sender($email->sender);
 
         return $this;
     }
