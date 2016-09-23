@@ -25,7 +25,7 @@ class Mail
     public function __construct()
     {
         $transport = new Swift_MailTransport();
-$transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
+        $transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
         $this->mailer = new Swift_Mailer($transport);
         $this->mail = $this->mailer->createMessage();
     }
@@ -72,9 +72,13 @@ $transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
         $email = (new Mails())->where('identifier', $template)
                               ->oneOrFail();
 
+        $platformName = context()->getOrDefault('platformName');
         $url = 'https://' . context()->getOrDefault('platformName') . '/';
         $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
         $content = (new Twig(null, $data))->setTemplate($email->content)->autoparse();
+        $logo = in_array($platformName, ['hi.gonparty.eu', 'shop.hardisland.com'])
+            ? ''
+            : ('<a href="#" target="_blank"><img src="' . $url . 'img/logotip-pdf.png" /></a>');
 
         $body = (new Twig(null, $data))->setTemplate(
             '<html>
@@ -83,7 +87,7 @@ $transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
 	</head>
 	<body style="margin: 0; background: #f2f2f2; font-family: Arial, sans-serif; font-size: 16px; padding:25px;">
 		<div style="width: 600px; margin: 0 auto; clear: both;">
-			<a href="#" target="_blank"><img src="' . $url . 'img/logotip-pdf.png" /></a>
+			' . $logo . '
 			
 			<span style="display: block; clear: both; height: auto; font-size: 24px; margin: 0 auto; text-transform: uppercase; font-weight:bold;">' . $subject . '</span>
 			<span style="display: block; clear: both; height: 1px; background: #c7c7c7; margin:10px 0 20px;"></span>
