@@ -7,6 +7,7 @@ use Swift_Mailer;
 use Swift_MailTransport;
 use Swift_Message;
 use Swift_Mime_SimpleMessage;
+use Swift_SendmailTransport;
 
 class Mail
 {
@@ -24,6 +25,7 @@ class Mail
     public function __construct()
     {
         $transport = new Swift_MailTransport();
+$transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
         $this->mailer = new Swift_Mailer($transport);
         $this->mail = $this->mailer->createMessage();
     }
