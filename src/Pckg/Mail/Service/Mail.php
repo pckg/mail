@@ -65,6 +65,7 @@ class Mail
 
         $url = 'https://' . context()->getOrDefault('platformName') . '/';
         $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
+        $content = (new Twig(null, $data))->setTemplate($email->content)->autoparse();
 
         $body = (new Twig(null, $data))->setTemplate(
             '<html>
@@ -77,7 +78,7 @@ class Mail
 			
 			<span style="display: block; clear: both; height: auto; font-size: 24px; margin: 0 auto; text-transform: uppercase; font-weight:bold;">' . $subject . '</span>
 			<span style="display: block; clear: both; height: 1px; background: #c7c7c7; margin:10px 0 20px;"></span>
-			' . $email->content . '
+			' . $content . '
 			
 			<span style="display: block; clear: both; height: 1px; background: #c7c7c7; margin-top:10px; margin-bottom:20px;"></span>
 			' . __('mail_content_footer') . '
