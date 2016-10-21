@@ -24,6 +24,12 @@ class Mail
 
     public function __construct()
     {
+        /**
+         * @T00D00 ... transport should be defined by environment ...
+         *         Production environment should be handled with Sendmail or Mail transport
+         *         Dev environment should be handled with File transport
+         *         Test environment should be handled with Test/Null transport
+         */
         $transport = new Swift_MailTransport();
         $transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
         $this->mailer = new Swift_Mailer($transport);
