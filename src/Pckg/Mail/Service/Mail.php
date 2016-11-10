@@ -86,6 +86,7 @@ class Mail
         $email = (new Mails())->where('identifier', $template)
                               ->oneOrFail();
 
+        // @T00D00 - remove platform, use domain!
         $platformName = context()->getOrDefault('platformName');
         $url = 'https://' . context()->getOrDefault('platformName') . '/';
         $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
