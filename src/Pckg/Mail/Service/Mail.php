@@ -1,6 +1,7 @@
 <?php namespace Pckg\Mail\Service;
 
 use Gnp\Mail\Entity\Mails;
+use Pckg\Framework\Exception\NotFound;
 use Pckg\Framework\View\Twig;
 use Swift_Attachment;
 use Swift_Mailer;
@@ -84,35 +85,24 @@ class Mail
     public function template($template, $data = [])
     {
         $email = (new Mails())->where('identifier', $template)
-                              ->oneOrFail();
+                              ->oneOrFail(
+                                  function() use ($template) {
+                                      throw new NotFound('Template ' . $template . ' not found');
+                                  }
+                              );
 
-        // @T00D00 - remove platform, use domain!
-        $platformName = context()->getOrDefault('platformName');
-        $url = 'https://' . context()->getOrDefault('platformName') . '/';
         $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
         $content = (new Twig(null, $data))->setTemplate($email->content)->autoparse();
-        $logo = in_array($platformName, ['hi.gonparty.eu', 'shop.hardisland.com'])
-            ? ''
-            : ('<a href="#" target="_blank"><img src="' . $url . 'img/logotip-pdf.png" /></a>');
 
-        $body = (new Twig(null, $data))->setTemplate(
-            '<html>
-	<head>
-		<title>' . strip_tags($subject) . '</title>
-	</head>
-	<body style="margin: 0; background: #f2f2f2; font-family: Arial, sans-serif; font-size: 16px; padding:25px;">
-		<div style="width: 600px; margin: 0 auto; clear: both;">
-			' . $logo . '
-			
-			<span style="display: block; clear: both; height: auto; font-size: 24px; margin: 0 auto; text-transform: uppercase; font-weight:bold;">' . $subject . '</span>
-			<span style="display: block; clear: both; height: 1px; background: #c7c7c7; margin:10px 0 20px;"></span>
-			' . $content . '
-			
-			<span style="display: block; clear: both; height: 1px; background: #c7c7c7; margin-top:10px; margin-bottom:20px;"></span>
-			' . __('mail_content_footer') . '
-		</div>
-	</body>
-</html>'
+        $body = view(
+            'Pckg\Mail:layout',
+            array_merge(
+                $data,
+                [
+                    'subject' => $subject,
+                    'content' => $content,
+                ]
+            )
         )->autoparse();
 
         $this->body($body)->subject($subject)->from($email->sender)->sender($email->sender);
@@ -128,10 +118,9 @@ class Mail
 
     }
 
-    public function attach($path, $mimeType = null, $name = null, $root = 'root')
+    public function attach($path, $mimeType = null, $name = null)
     {
-        $dir = $root ? path($root) : '';
-        $this->mail->attach(Swift_Attachment::fromPath($dir . $path, $mimeType)->setFilename($name));
+        $this->mail->attach(Swift_Attachment::fromPath($path, $mimeType)->setFilename($name));
 
         return $this;
     }
