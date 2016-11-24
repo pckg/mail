@@ -75,7 +75,7 @@ class SendMail extends Command
                         $realData['order']->generateEstimate();
                     }
                     $mailService->attach(
-                        path('app_storage') . 'estimates' . path('ds') . $realData['order']->getData('estimate_url'),
+                        $realData['order']->getAbsoluteEstimateUrlAttribute(),
                         null,
                         $name . '.pdf'
                     );
