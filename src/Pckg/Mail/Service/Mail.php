@@ -112,6 +112,9 @@ class Mail
 
     public function subjectAndContent($subject, $content, $data = [])
     {
+        $subject = (new Twig(null, $data))->setTemplate($subject)->autoparse();
+        $content = (new Twig(null, $data))->setTemplate($content)->autoparse();
+
         $body = view(
             'Pckg\Mail:layout',
             array_merge(
