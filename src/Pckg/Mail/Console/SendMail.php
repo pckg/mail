@@ -62,8 +62,16 @@ class SendMail extends Command
         /**
          * Create mail template, body, subject, receiver.
          */
-        $mailService->template($template, $realData)
-                    ->to($user->getEmail(), $user->getFullName());
+        if ($template) {
+            $mailService->template($template, $realData)
+                        ->to($user->getEmail(), $user->getFullName());
+        } else {
+            $mailService->body($data['content'] ?? '')
+                        ->subject($data['subject'] ?? '')
+                        ->from(config('site.email'), config('site.title'))
+                        ->sender(config('site.email'), config('site.title'))
+                        ->to($user->getEmail(), $user->getFullName());
+        }
 
         /**
          * Add attachments.
