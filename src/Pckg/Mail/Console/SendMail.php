@@ -66,8 +66,11 @@ class SendMail extends Command
             $mailService->template($template, $realData)
                         ->to($user->getEmail(), $user->getFullName());
         } else {
-            $mailService->subjectAndContent($data['subject'] ?? '', $data['content'] ?? '', $realData)
-                        ->to($user->getEmail(), $user->getFullName());
+            $mailService->subjectAndContent(
+                $data['subject'] ?? '',
+                $data['content'] ?? '',
+                $realData
+            )->to($user->getEmail(), $user->getFullName());
         }
 
         /**
