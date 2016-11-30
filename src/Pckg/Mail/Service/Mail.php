@@ -110,6 +110,27 @@ class Mail
         return $this;
     }
 
+    public function subjectAndContent($subject, $content, $data = [])
+    {
+        $body = view(
+            'Pckg\Mail:layout',
+            array_merge(
+                $data,
+                [
+                    'subject' => $subject,
+                    'content' => $content,
+                ]
+            )
+        )->autoparse();
+
+        $this->body($body)
+             ->subject($subject)
+             ->from(config('site.email'), config('site.title'))
+             ->sender(config('site.email'), config('site.title'));
+
+        return $this;
+    }
+
     public function plainBody($body)
     {
         $this->mail->addPart($body, 'text/plain');
