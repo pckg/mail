@@ -125,8 +125,8 @@ class Mail
 
         $this->body($body)
              ->subject($subject)
-             ->from(config('site.email'), config('site.title'))
-             ->sender(config('site.email'), config('site.title'));
+             ->from(config('site.contact.email'), config('site.contact.title'))
+             ->sender(config('site.contact.email'), config('site.contact.title'));
 
         return $this;
     }
