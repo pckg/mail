@@ -59,6 +59,12 @@ class SendMail extends Command
          */
         $user = unserialize(base64_decode($user));
 
+        if (strpos($user->getEmail(), '@gnp.si')) {
+            $this->output('Skipping ' . $user->getEmail());
+
+            return;
+        }
+
         /**
          * Create mail template, body, subject, receiver.
          */
