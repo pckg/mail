@@ -1,0 +1,32 @@
+{% if data.stat.graylist or data.stat.unavailable or data.stat.later %}
+    <div class="bg-danger" style="padding: 2rem;">
+        {% if data.stat.graylist %}
+            <h2>Graylist</h2>
+            {% for line in data.graylist %}<p>{{ line }}</p>{% endfor %}
+        {% endif %}
+
+        {% if data.stat.unavailable %}
+            <h2>Unavailable</h2>
+            {% for line in data.stat.unavailable %}<p>{{ line }}</p>{% endfor %}
+        {% endif %}
+
+        {% if data.stat.later %}
+            <h2>Later</h2>
+            {% for line in data.stat.later %}<p>{{ line }}</p>{% endfor %}
+        {% endif %}
+    </div>
+{% endif %}
+
+{% if data.stat.unknownUser %}
+    <div class="bg-warning" style="padding: 2rem;">
+        <h2>Unknown user</h2>
+        {% for line in data.stat.unknownUser %}<p>{{ line }}</p>{% endfor %}
+    </div>
+{% endif %}
+
+{% if data.stat.sent %}
+    <div class="bg-success" style="padding: 2rem;">
+        <h2>Sent</h2>
+        {% for line in data.stat.sent %}<p>{{ line }}</p>{% endfor %}
+    </div>
+{% endif %}

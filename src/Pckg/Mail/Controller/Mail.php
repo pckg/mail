@@ -137,10 +137,13 @@ class Mail
             'verifyFail'  => [],
             '7bit'        => [],
             'fromRoot'    => [],
-            'graylist'    => [],
             'unknownUser' => [],
         ];
+        $to = null;
         foreach (explode("\n", $content) as $line) {
+            if (!$line) {
+                continue;
+            }
             $found = false;
             /**
              * Parse date.
@@ -172,7 +175,6 @@ class Mail
             /**
              * Parse to.
              */
-            $to = null;
             if (($toStart = strpos($line, 'to=<'))) {
                 $toStart += strlen('to=<');
                 $toEnd = strpos($line, '>,', $toStart);
@@ -191,6 +193,9 @@ class Mail
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Message accepted for delivery')) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent (<') === 0 && strpos($stat, '> Mail accepted)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, ' (OK ') && strpos($stat, ' - gsmtp)')) {
@@ -217,7 +222,9 @@ class Mail
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
-                } elseif (strpos($stat, 'Please try again later') >= 0) {
+                } elseif (strpos($stat, 'Please try again later') > 0
+                          || strpos($stat, 'Please try again later') === 0
+                ) {
                     $data['stat']['later'][] = $to . ' - ' . $line;
 
                 } else {
@@ -228,10 +235,10 @@ class Mail
                 $statStart += strlen('DSN: ');
                 $stat = substr($line, $statStart);
                 if (strpos($stat, 'User unknown') === 0) {
-                    $data['stat']['unknownUser'][] = $line;
+                    $data['stat']['unknownUser'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
-                    $data['stat']['unavailable'][] = $line;
+                    $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
                 } else {
                     d("Stat2", $line, $stat);
@@ -241,7 +248,7 @@ class Mail
                 $statStart += strlen('Milter: data, reject=');
                 $stat = substr($line, $statStart);
                 if (strpos($stat, 'Please try again later')) {
-                    $data['stat']['later'][] = $line;
+                    $data['stat']['later'][] = $to . ' - ' . $line;
 
                 } else {
                     d("Stat3", $line, $stat);
@@ -314,7 +321,13 @@ class Mail
 
             }
         }
-        dd($data['stat']);
+
+        return view(
+            'mail/parseLog',
+            [
+                'data' => $data,
+            ]
+        );
     }
 
 }
