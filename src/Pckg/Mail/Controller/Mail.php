@@ -122,4 +122,199 @@ class Mail
         ];
     }
 
+    public function getParseLogAction()
+    {
+        $file = '/var/log/mail.log';
+        $content = file_get_contents($file);
+        $data = [
+            'msgId'       => [],
+            'code'        => [],
+            'code2msgId'  => [],
+            'msgId2code'  => [],
+            'date'        => [],
+            'code2stat'   => [],
+            'stat'        => [],
+            'verifyFail'  => [],
+            '7bit'        => [],
+            'fromRoot'    => [],
+            'graylist'    => [],
+            'unknownUser' => [],
+        ];
+        foreach (explode("\n", $content) as $line) {
+            $found = false;
+            /**
+             * Parse date.
+             */
+            $date = substr($line, 0, 15);
+            $data['date'][$date][] = $line;
+
+            /**
+             * Parse code.
+             */
+            $codeStart = strpos($line, ':', 15) + 2;
+            $codeEnd = strpos($line, ':', $codeStart);
+            $code = substr($line, $codeStart, $codeEnd - $codeStart);
+            $data['code'][$code][] = $line;
+
+            /**
+             * Parse msgId.
+             */
+            if (($msgIdStart = strpos($line, 'msgid=<')) && ($swiftStart = strpos($line, '@'))) {
+                $start = $msgIdStart + strlen('msgid=<');
+                $length = $swiftStart - $msgIdStart - strlen('msgid=<');
+                $msgId = substr($line, $start, $length);
+                $data['msgId'][$msgId][] = $line;
+                $data['code2msgId'][$code][] = $msgId;
+                $data['msgId2code'][$msgId][] = $code;
+                $found = true;
+            }
+
+            /**
+             * Parse to.
+             */
+            $to = null;
+            if (($toStart = strpos($line, 'to=<'))) {
+                $toStart += strlen('to=<');
+                $toEnd = strpos($line, '>,', $toStart);
+                $length = $toEnd - $toStart;
+                $to = substr($line, $toStart, $length);
+            }
+
+            /**
+             * Parse Stat
+             */
+            $stat = null;
+            if (($statStart = strpos($line, ', stat='))) {
+                $statStart += strlen(', stat=');
+                $stat = substr($line, $statStart);
+                if (in_array($stat, ['Sent', 'Sent (ok dirdel)'])) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Message accepted for delivery')) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, ' (OK ') && strpos($stat, ' - gsmtp)')) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent (OK id=') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Queued mail for delivery)')) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent (2.0.0 Ok: queued as ') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent (Requested mail action okay, completed: id=') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Deferred') === 0 && strpos($stat, 'greylist')) {
+                    $data['stat']['graylist'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'User unknown') === 0) {
+                    $data['stat']['unknownUser'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Service unavailable') === 0) {
+                    $data['stat']['unavailable'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Please try again later') >= 0) {
+                    $data['stat']['later'][] = $to . ' - ' . $line;
+
+                } else {
+                    d("Stat", $line, $stat);
+                }
+                $found = true;
+            } elseif (($statStart = strpos($line, 'DSN: '))) {
+                $statStart += strlen('DSN: ');
+                $stat = substr($line, $statStart);
+                if (strpos($stat, 'User unknown') === 0) {
+                    $data['stat']['unknownUser'][] = $line;
+
+                } elseif (strpos($stat, 'Service unavailable') === 0) {
+                    $data['stat']['unavailable'][] = $line;
+
+                } else {
+                    d("Stat2", $line, $stat);
+                }
+                $found = true;
+            } elseif (($statStart = strpos($line, 'Milter: data, reject='))) {
+                $statStart += strlen('Milter: data, reject=');
+                $stat = substr($line, $statStart);
+                if (strpos($stat, 'Please try again later')) {
+                    $data['stat']['later'][] = $line;
+
+                } else {
+                    d("Stat3", $line, $stat);
+                }
+                $found = true;
+            }
+
+            /**
+             * Failed server verification (SSL)
+             */
+            if (strpos($line, ', version=TLSv1.2, verify=FAIL, cipher=')) {
+                $data['verifyFail'][$code][] = $line;
+                $found = true;
+            } elseif (strpos($line, ', version=TLSv1, verify=FAIL, cipher=')) {
+                $data['verifyFail'][$code][] = $line;
+                $found = true;
+            }
+
+            /**
+             * Dkim
+             */
+            if (strpos($line, 'header: DKIM-Signature:')) {
+                $data['dkim'][$code][] = $line;
+                $found = true;
+            }
+
+            /**
+             * From=root emails.
+             */
+            if (strpos($line, ': from=root, ')) {
+                $data['fromRoot'][] = $line;
+                $found = true;
+            }
+
+            /**
+             * 7bit
+             */
+            if (strpos($line, 'bodytype=7BIT, ')) {
+                $data['7bit'][] = $line;
+                $found = true;
+            }
+
+            /**
+             * System
+             */
+            if (strpos($line, 'restarting /usr/sbin/sendmail-mta')) {
+                $data['service'][] = $line;
+                $found = true;
+            } elseif (strpos($line, 'starting daemon')) {
+                $data['service'][] = $line;
+                $found = true;
+            } elseif (strpos($line, 'alias database')) {
+                $data['service'][] = $line;
+                $found = true;
+            } elseif (strpos($line, ': /etc/mail/aliases:')) {
+                $data['service'][] = $line;
+                $found = true;
+            }
+
+            /**
+             * System
+             */
+            if (strpos($line, 'opendkim')) {
+                $data['opendkim'][] = $line;
+                $found = true;
+            }
+
+            if (!$found && $line) {
+                d("Unknown", $line);
+
+            }
+        }
+        dd($data['stat']);
+    }
+
 }
