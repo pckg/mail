@@ -5,6 +5,7 @@ use Derive\Orders\Entity\Orders;
 use Derive\Orders\Entity\OrdersUsers;
 use Derive\Orders\Entity\Users;
 use Derive\User\Service\Mail\User;
+use Exception;
 use Gnp\Mail\Record\Mail as MailRecord;
 use Pckg\Collection;
 use Pckg\Framework\Helper\Traits;
@@ -70,6 +71,13 @@ class Mail
                     $data['fetch']['user'][Users::class] = $order->user_id;
                     $data['fetch']['offer'][Offers::class] = $order->offer_id;
 
+                } else {
+                    throw new Exception("Unknown recipient type");
+
+                }
+
+                if (!$receiver) {
+                    throw new Exception("No receiver");
                 }
 
                 /**
