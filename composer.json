@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "swiftmailer/swiftmailer": "dev-master"
+    "swiftmailer/swiftmailer": "5.*"
   },
   "minimum-stability": "dev",
   "autoload": {
