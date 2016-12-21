@@ -1,6 +1,8 @@
 <?php namespace Pckg\Mail\Console;
 
 use Exception;
+use Gnp\Mail\Entity\Mails;
+use Gnp\Mail\Record\MailsSent;
 use Pckg\Database\Repository;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
@@ -102,6 +104,24 @@ class SendMail extends Command
          */
         if (!$mailService->send()) {
             throw new Exception('Mail not sent!');
+        }
+
+        /**
+         * Save log.
+         */
+        if ($template) {
+            $mailTemplate = (new Mails())->where('identifier', $template)->one();
+            $mail = $mailService->mail();
+            MailsSent::create(
+                [
+                    'mail_id'  => $mailTemplate->id,
+                    'subject'  => $mail->getSubject(),
+                    'content'  => $mail->getBody(),
+                    'from'     => $mail->getFrom(),
+                    'to'       => $mail->getTo(),
+                    'datetime' => date('Y-m-d H:i:s'),
+                ]
+            );
         }
 
         $this->output('Mail sent!');

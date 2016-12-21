@@ -105,7 +105,10 @@ class Mail
             )
         )->autoparse();
 
-        $this->body($body)->subject($subject)->from($email->sender)->sender($email->sender);
+        $this->body($body)
+             ->subject($subject)
+             ->from($email->sender)
+             ->sender($email->sender);
 
         return $this;
     }
@@ -152,6 +155,11 @@ class Mail
     public function send()
     {
         return $this->mailer->send($this->mail);
+    }
+
+    public function mail()
+    {
+        return $this->mail;
     }
 
 }
