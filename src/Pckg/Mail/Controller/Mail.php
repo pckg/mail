@@ -56,8 +56,8 @@ class Mail
                     $data['fetch']['user'][Users::class] = $user->id;
 
                 } else if ($recipient['type'] == 'orderUser') {
-                    $orderUser = (new OrdersUsers())->where('id', $recipient['id']);
-                    $receiver = new User($orderUser->one()->user);
+                    $orderUser = (new OrdersUsers())->where('id', $recipient['id'])->one();
+                    $receiver = new User($orderUser->user);
                     $data['fetch']['orderUser'][OrdersUsers::class] = $orderUser->id;
                     $data['fetch']['order'][Orders::class] = $orderUser->order_id;
                     $data['fetch']['offer'][Offers::class] = $orderUser->order->offer_id;
