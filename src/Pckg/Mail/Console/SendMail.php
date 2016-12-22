@@ -3,6 +3,7 @@
 use Exception;
 use Gnp\Mail\Entity\Mails;
 use Gnp\Mail\Record\MailsSent;
+use Pckg\Collection;
 use Pckg\Database\Repository;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
@@ -58,6 +59,8 @@ class SendMail extends Command
          * Get user.
          *
          * @var Recipient
+         *
+         * @T00D00 - support for user id
          */
         $user = unserialize(base64_decode($user));
 
@@ -117,8 +120,16 @@ class SendMail extends Command
                     'mail_id'  => $mailTemplate->id,
                     'subject'  => $mail->getSubject(),
                     'content'  => $mail->getBody(),
-                    'from'     => $mail->getFrom(),
-                    'to'       => $mail->getTo(),
+                    'from'     => (new Collection($mail->getFrom()))->map(
+                        function($name, $mail) {
+                            return $name . ' <' . $mail . '>';
+                        }
+                    )->implode(', ', ' and '),
+                    'to'       => (new Collection($mail->getTo()))->map(
+                        function($name, $mail) {
+                            return $name . ' <' . $mail . '>';
+                        }
+                    )->implode(', ', ' and '),
                     'datetime' => date('Y-m-d H:i:s'),
                 ]
             );
