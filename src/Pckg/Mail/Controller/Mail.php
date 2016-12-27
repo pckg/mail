@@ -277,6 +277,9 @@ class Mail
                     d("Stat3", $line, $stat);
                 }
                 $found = true;
+            } elseif (strpos($line, ': sender notify: Warning: could not send message')) {
+                $data['stat']['delayed'][] = $to . ' - ' . $line;
+                $found = true;
             }
 
             /**
@@ -337,10 +340,6 @@ class Mail
             if (strpos($line, 'opendkim')) {
                 $data['opendkim'][] = $line;
                 $found = true;
-            }
-
-            if (strpos($line, ': sender notify: Warning: could not send message')) {
-                $data['stat']['delayed'][] = $to . ' - ' . $line;
             }
 
             if (!$found && $line) {
