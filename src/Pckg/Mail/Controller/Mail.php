@@ -236,9 +236,6 @@ class Mail
                 } elseif (strpos($stat, 'Deferred: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
-                } elseif (strpos($stat, ': timeout waiting for input from ') === 0) {
-                    $data['stat']['unavailable'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Host unknown (Name server: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
@@ -292,6 +289,12 @@ class Mail
             } elseif (strpos($line, ': sender notify: Warning: could not send message')) {
                 $data['stat']['delayed'][] = $to . ' - ' . $line;
                 $found = true;
+            } elseif (strpos($line, ': sender notify: could not send message for ')) {
+                $data['stat']['delayed'][] = $to . ' - ' . $line;
+                $found = true;
+            } elseif (strpos($stat, ': timeout waiting for input from ') === 0) {
+                $data['stat']['unavailable'][] = $to . ' - ' . $line;
+
             }
 
             /**
