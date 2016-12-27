@@ -197,7 +197,7 @@ class Mail
             if (($statStart = strpos($line, ', stat='))) {
                 $statStart += strlen(', stat=');
                 $stat = substr($line, $statStart);
-                if (in_array($stat, ['Sent', 'Sent (ok dirdel)'])) {
+                if (in_array($stat, ['Sent', 'Sent (ok dirdel)', 'Sent (Queued!)'])) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Message accepted for delivery')) {
@@ -221,11 +221,14 @@ class Mail
                 } elseif (strpos($stat, 'Sent (Requested mail action okay, completed: id=') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
+                } elseif (strpos($stat, 'Deferred: Connection timed out with ') === 0) {
+                    $data['stat']['unavailable'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Host unknown (Name server: ') === 0) {
+                    $data['stat']['unavailable'][] = $to . ' - ' . $line;
+
                 } elseif (strpos($stat, 'Deferred') === 0 && strpos($stat, 'greylist')) {
                     $data['stat']['graylist'][] = $to . ' - ' . $line;
-
-                } elseif (strpos($stat, 'User unknown') === 0) {
-                    $data['stat']['unknownUser'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
@@ -322,6 +325,10 @@ class Mail
             if (strpos($line, 'opendkim')) {
                 $data['opendkim'][] = $line;
                 $found = true;
+            }
+
+            if (strpos($line, ': sender notify: Warning: could not send message')) {
+                $data['stat']['delayed'][] = $to . ' - ' . $line;
             }
 
             if (!$found && $line) {

@@ -17,10 +17,16 @@
     </div>
 {% endif %}
 
-{% if data.stat.unknownUser %}
+{% if data.stat.unknownUser or data.stat.delayed %}
     <div class="bg-warning" style="padding: 2rem;">
-        <h2>Unknown user</h2>
-        {% for line in data.stat.unknownUser %}<p>{{ line }}</p>{% endfor %}
+        {% if data.stat.delayed %}
+            <h2>Delayed</h2>
+            {% for line in data.stat.delayed %}<p>{{ line }}</p>{% endfor %}
+        {% endif %}
+        {% if data.stat.unknownUser %}
+            <h2>Unknown user</h2>
+            {% for line in data.stat.unknownUser %}<p>{{ line }}</p>{% endfor %}
+        {% endif %}
     </div>
 {% endif %}
 
