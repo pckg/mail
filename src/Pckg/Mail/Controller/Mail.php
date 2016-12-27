@@ -230,7 +230,7 @@ class Mail
                 } elseif (strpos($stat, 'Sent (Ok: queued as ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
-                } elseif (strpos($stat, 'Deferred: Connection timed out with ') === 0) {
+                } elseif (strpos($stat, 'Deferred: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Host unknown (Name server: ') === 0) {
