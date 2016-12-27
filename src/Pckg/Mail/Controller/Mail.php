@@ -203,6 +203,9 @@ class Mail
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Message accepted for delivery')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
+                } elseif (strpos($stat, 'Sent (Requested mail action okay, completed: id=') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
                 } elseif (strpos($stat, 'Sent (<') === 0 && strpos($stat, '> Mail accepted)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
@@ -233,10 +236,16 @@ class Mail
                 } elseif (strpos($stat, 'Deferred: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
+                } elseif (strpos($stat, ': timeout waiting for input from ') === 0) {
+                    $data['stat']['unavailable'][] = $to . ' - ' . $line;
+
                 } elseif (strpos($stat, 'Host unknown (Name server: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Deferred') === 0 && strpos($stat, 'greylist')) {
+                    $data['stat']['graylist'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, ': sender notify: Cannot send message for ') === 0) {
                     $data['stat']['graylist'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
