@@ -224,7 +224,10 @@ class Mail
                 } elseif (strpos($stat, 'Sent (2.0.0 Ok: queued as ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
-                } elseif (strpos($stat, 'Sent (Requested mail action okay, completed: id=') === 0) {
+                } elseif (strpos($stat, 'Sent (2.0.0 Ok: queued as ') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent (Ok: queued as ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Deferred: Connection timed out with ') === 0) {
