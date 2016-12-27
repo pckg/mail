@@ -197,7 +197,7 @@ class Mail
             if (($statStart = strpos($line, ', stat='))) {
                 $statStart += strlen(', stat=');
                 $stat = substr($line, $statStart);
-                if (in_array($stat, ['Sent', 'Sent (ok dirdel)', 'Sent (Queued!)'])) {
+                if (in_array($stat, ['Sent', 'Sent (ok dirdel)', 'Sent (Queued!)', 'Sent (Ok.)'])) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Message accepted for delivery')) {
@@ -239,6 +239,9 @@ class Mail
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
+                } elseif (in_array($stat, ['User unknown', 'Unknown'])) {
+                    $data['stat']['unknownUser'][] = $to . ' - ' . $line;
+
                 } elseif (strpos($stat, 'Please try again later') > 0
                           || strpos($stat, 'Please try again later') === 0
                 ) {
@@ -255,6 +258,9 @@ class Mail
                     $data['stat']['unknownUser'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
+                    $data['stat']['unavailable'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Host unknown (Name server: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
 
                 } else {
