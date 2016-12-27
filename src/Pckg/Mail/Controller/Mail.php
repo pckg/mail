@@ -212,6 +212,12 @@ class Mail
                 } elseif (strpos($stat, 'Sent (OK id=') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
+                } elseif (strpos($stat, 'Sent (ok ') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent (ok:  Message ') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Queued mail for delivery)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
