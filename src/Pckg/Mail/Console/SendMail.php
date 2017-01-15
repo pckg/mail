@@ -112,28 +112,31 @@ class SendMail extends Command
         /**
          * Save log.
          */
+        $mailTemplate = null;
         if ($template) {
             $mailTemplate = (new Mails())->where('identifier', $template)->one();
             $mail = $mailService->mail();
-            MailsSent::create(
-                [
-                    'mail_id'  => $mailTemplate->id,
-                    'subject'  => $mail->getSubject(),
-                    'content'  => $mail->getBody(),
-                    'from'     => (new Collection($mail->getFrom()))->map(
-                        function($name, $mail) {
-                            return $name . ' <' . $mail . '>';
-                        }
-                    )->implode(', ', ' and '),
-                    'to'       => (new Collection($mail->getTo()))->map(
-                        function($name, $mail) {
-                            return $name . ' <' . $mail . '>';
-                        }
-                    )->implode(', ', ' and '),
-                    'datetime' => date('Y-m-d H:i:s'),
-                ]
-            );
         }
+        MailsSent::create(
+            [
+                'mail_id'  => $mailTemplate
+                    ? $mailTemplate->id
+                    : null,
+                'subject'  => $mail->getSubject(),
+                'content'  => $mail->getBody(),
+                'from'     => (new Collection($mail->getFrom()))->map(
+                    function($name, $mail) {
+                        return $name . ' <' . $mail . '>';
+                    }
+                )->implode(', ', ' and '),
+                'to'       => (new Collection($mail->getTo()))->map(
+                    function($name, $mail) {
+                        return $name . ' <' . $mail . '>';
+                    }
+                )->implode(', ', ' and '),
+                'datetime' => date('Y-m-d H:i:s'),
+            ]
+        );
 
         $this->output('Mail sent!');
     }
