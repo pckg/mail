@@ -90,7 +90,7 @@ class SendMail extends Command
         if (isset($data['attach'])) {
             foreach ($data['attach'] as $key => $name) {
                 if ($key == 'estimate') {
-                    if (!$realData['order']->getData('estimate_url')) {
+                    if (!$realData['order']->data('estimate_url')) {
                         $realData['order']->generateEstimate();
                     }
                     $mailService->attach(
