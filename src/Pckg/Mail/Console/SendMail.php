@@ -30,6 +30,12 @@ class SendMail extends Command
                  [
                      'template-required' => '',
                  ]
+             )
+             ->addOptions(
+                 [
+                     'dump' => 'Dump instead of send?',
+                 ],
+                 InputOption::VALUE_OPTIONAL
              );
     }
 
@@ -37,6 +43,7 @@ class SendMail extends Command
     {
         $template = $this->option('template');
         $user = $this->option('user');
+        $dump = $this->option('dump');
         $data = (array)json_decode($this->option('data'), true);
         $realData = [];
         if (!empty($data['data'])) {
@@ -64,24 +71,40 @@ class SendMail extends Command
          */
         $user = unserialize(base64_decode($user));
 
-        if (strpos($user->getEmail(), '@gnp.si')) {
+        if (is_object($user) && strpos($user->getEmail(), '@gnp.si')) {
             $this->output('Skipping ' . $user->getEmail());
 
             return;
         }
 
         /**
-         * Create mail template, body, subject, receiver.
+         * Create recipient.
+         */
+        if (is_object($user)) {
+            $email = $user->getEmail();
+            $fullName = $user->getFullName();
+        } elseif (!$dump) {
+            throw new Exception("Recipient not set");
+        }
+
+        /**
+         * Create mail template, body, subject.
          */
         if ($template) {
-            $mailService->template($template, $realData)
-                        ->to($user->getEmail(), $user->getFullName());
+            $mailService->template($template, $realData);
         } else {
             $mailService->subjectAndContent(
                 $data['subject'] ?? '',
                 $data['content'] ?? '',
                 $realData
-            )->to($user->getEmail(), $user->getFullName());
+            );
+        }
+
+        /**
+         * Set email receiver.
+         */
+        if (!$dump) {
+            $mailService->to($email, $fullName);
         }
 
         /**
@@ -105,7 +128,13 @@ class SendMail extends Command
         /**
          * Send email.
          */
-        if (!$mailService->send()) {
+        if ($dump) {
+            $path = path('tmp') . 'mails' . path('ds') . date('YmdHis') . '-' . sha1(microtime()) . '.html';
+            file_put_contents($path, $mailService->mail()->getBody());
+            $this->output('Dumped: ' . $path);
+
+            return;
+        } elseif (!$mailService->send()) {
             throw new Exception('Mail not sent!');
         }
 
