@@ -144,8 +144,8 @@ class SendMail extends Command
         $mailTemplate = null;
         if ($template) {
             $mailTemplate = (new Mails())->where('identifier', $template)->one();
-            $mail = $mailService->mail();
         }
+        $mail = $mailService->mail();
         MailsSent::create(
             [
                 'mail_id'  => $mailTemplate
