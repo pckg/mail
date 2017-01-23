@@ -13,7 +13,7 @@ class Mailchimp
 
     public function getEnewsAction()
     {
-        return view('mailchimp\enews');
+        return view('Pckg\Mail:mailchimp\enews');
     }
 
     public function postEnewsAction(Offer $offer = null)
