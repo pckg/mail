@@ -16,6 +16,11 @@ class Mailchimp
         return view('Pckg\Mail:mailchimp\enews');
     }
 
+    public function getEnewsOfferAction(Offer $offer)
+    {
+        return view('Pckg\Mail:mailchimp\enewsoffer', ['offer' => $offer]);
+    }
+
     public function postEnewsAction(Offer $offer = null)
     {
         $email = post('email');
