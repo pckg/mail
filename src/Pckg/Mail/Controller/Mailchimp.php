@@ -62,7 +62,11 @@ class Mailchimp
                                                        );
         }
 
-        return response()->respondWithSuccess();
+        return response()->respondWithSuccess(
+            [
+                'text' => 'Success',
+            ]
+        );
     }
 
 }
