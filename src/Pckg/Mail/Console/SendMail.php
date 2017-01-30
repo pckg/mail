@@ -113,9 +113,14 @@ class SendMail extends Command
         if (isset($data['attach'])) {
             foreach ($data['attach'] as $key => $name) {
                 if ($key == 'estimate') {
-                    if (!$realData['order']->data('estimate_url')) {
-                        $realData['order']->generateEstimate();
-                    }
+                    /**
+                     * Estimate is generated each time it's attached.
+                     */
+                    $realData['order']->generateEstimate();
+
+                    /**
+                     * Attach estimate.
+                     */
                     $mailService->attach(
                         $realData['order']->getAbsoluteEstimateUrlAttribute(),
                         null,
