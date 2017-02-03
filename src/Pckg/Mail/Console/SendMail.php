@@ -97,20 +97,20 @@ class SendMail extends Command
         /**
          * Create mail template, body, subject.
          */
-        runInLocale(
-            function() use ($template, $mailService, $data, $realData) {
-                if ($template) {
+        if ($template) {
+            runInLocale(
+                function() use ($template, $mailService, $realData) {
                     $mailService->template($template, $realData);
-                } else {
-                    $mailService->subjectAndContent(
-                        $data['subject'] ?? '',
-                        $data['content'] ?? '',
-                        $realData
-                    );
-                }
-            },
-            $user->getLocale()
-        );
+                },
+                $user->getLocale()
+            );
+        } else {
+            $mailService->subjectAndContent(
+                $data['subject'] ?? '',
+                $data['content'] ?? '',
+                $realData
+            );
+        }
 
         /**
          * Set email receiver.
