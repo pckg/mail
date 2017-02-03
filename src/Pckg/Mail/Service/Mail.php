@@ -85,6 +85,7 @@ class Mail
     public function template($template, $data = [])
     {
         $email = (new Mails())->where('identifier', $template)
+                              ->joinFallbackTranslation()
                               ->oneOrFail(
                                   function() use ($template) {
                                       throw new NotFound('Template ' . $template . ' not found');

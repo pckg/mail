@@ -7,4 +7,8 @@ interface Recipient
 
     public function getEmail();
 
+    public function getLocale();
+
+    public function getLanguage();
+
 }

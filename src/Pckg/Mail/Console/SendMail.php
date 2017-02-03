@@ -1,5 +1,7 @@
 <?php namespace Pckg\Mail\Console;
 
+use Derive\Orders\Entity\Users;
+use Derive\User\Service\Mail\User;
 use Exception;
 use Gnp\Mail\Entity\Mails;
 use Gnp\Mail\Record\MailsSent;
@@ -7,7 +9,6 @@ use Pckg\Collection;
 use Pckg\Database\Repository;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
-use Pckg\Mail\Service\Mail\Adapter\Recipient;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -62,15 +63,21 @@ class SendMail extends Command
             }
         }
 
-        /**
-         * Get user.
-         *
-         * @var Recipient
-         *
-         * @T00D00 - support for user id
-         */
-        $user = unserialize(base64_decode($user));
+        if (is_numeric($user)) {
+            /**
+             * Receive user from database.
+             */
+            $user = new User((new Users())->where('id', $user)->oneOrFail());
+        } else {
+            /**
+             * Object was passed.
+             */
+            $user = unserialize(base64_decode($user));
+        }
 
+        /**
+         * Skip dummy email.
+         */
         if (is_object($user) && strpos($user->getEmail(), '@gnp.si')) {
             $this->output('Skipping ' . $user->getEmail());
 
@@ -90,15 +97,20 @@ class SendMail extends Command
         /**
          * Create mail template, body, subject.
          */
-        if ($template) {
-            $mailService->template($template, $realData);
-        } else {
-            $mailService->subjectAndContent(
-                $data['subject'] ?? '',
-                $data['content'] ?? '',
-                $realData
-            );
-        }
+        runInLocale(
+            function() use ($template, $mailService, $data, $realData) {
+                if ($template) {
+                    $mailService->template($template, $realData);
+                } else {
+                    $mailService->subjectAndContent(
+                        $data['subject'] ?? '',
+                        $data['content'] ?? '',
+                        $realData
+                    );
+                }
+            },
+            $user->getLocale()
+        );
 
         /**
          * Set email receiver.
