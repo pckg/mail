@@ -83,7 +83,6 @@ class SendMail extends Command
 
             return;
         }
-
         /**
          * Create recipient.
          */
