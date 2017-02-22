@@ -59,9 +59,18 @@ class Mail
         return $this;
     }
 
-    public function to($email, $name = null)
+    public function to($emails, $name = null)
     {
-        $this->mail->addTo($email, $name);
+        if (!is_array($emails)) {
+            $emails = [$name => $emails];
+        }
+
+        foreach ($emails as $key => $value) {
+            $this->mail->addTo(
+                is_int($key) ? $value : $key,
+                is_int($key) ? $name : $value
+            );
+        }
 
         return $this;
     }
