@@ -87,13 +87,13 @@ class Mail
     public function to($emails, $name = null)
     {
         if (!is_array($emails)) {
-            $emails = [$name => $emails];
+            $emails = [$emails => $name ?? $emails];
         }
 
         foreach ($emails as $key => $value) {
             $this->mail->addTo(
                 is_int($key) ? $value : $key,
-                is_int($key) ? $name : $value
+                is_int($key) && $name ? $name : $value
             );
         }
 
