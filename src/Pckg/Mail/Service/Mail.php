@@ -1,5 +1,7 @@
 <?php namespace Pckg\Mail\Service;
 
+use Derive\User\Service\Mail\Admin;
+use Derive\User\Service\Mail\Site;
 use Gnp\Mail\Entity\Mails;
 use Pckg\Framework\Exception\NotFound;
 use Pckg\Framework\View\Twig;
@@ -59,6 +61,29 @@ class Mail
         return $this;
     }
 
+    public function fromSite()
+    {
+        $site = new Site();
+
+        $this->from($site->getEmail(), $site->getFullName());
+        $this->sender($site->getEmail(), $site->getFullName());
+    }
+
+    public function toAdmin()
+    {
+        $admin = new Admin();
+        $site = new Site();
+        $emails = $admin->getEmail();
+
+        if (!is_array($emails)) {
+            $emails = [$emails];
+        }
+
+        foreach ($emails as $email) {
+            $this->to($email, $site->getFullName() . ' Administrator');
+        }
+    }
+
     public function to($emails, $name = null)
     {
         if (!is_array($emails)) {
@@ -116,9 +141,9 @@ class Mail
         )->autoparse();
 
         $this->body($body)
-             ->subject($subject)
-             ->from($email->sender)
-             ->sender($email->sender);
+             ->subject($subject);
+
+        $this->fromSite();
 
         return $this;
     }
@@ -140,9 +165,9 @@ class Mail
         )->autoparse();
 
         $this->body($body)
-             ->subject($subject)
-             ->from(config('site.contact.email'), config('site.contact.title'))
-             ->sender(config('site.contact.email'), config('site.contact.title'));
+             ->subject($subject);
+
+        $this->fromSite();
 
         return $this;
     }
