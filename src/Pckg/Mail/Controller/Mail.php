@@ -209,6 +209,9 @@ class Mail
                 } elseif (strpos($stat, 'Sent (<') === 0 && strpos($stat, '> Mail accepted)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
+                } elseif (strpos($stat, 'Sent (') === 0 && strpos($stat, ' accepted message ')) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, ' (OK ') && strpos($stat, ' - gsmtp)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
@@ -231,6 +234,9 @@ class Mail
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Sent (Ok: queued as ') === 0) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
+                } elseif (strpos($stat, 'Sent (Message Queued (') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
                 } elseif (strpos($stat, 'Deferred: ') === 0) {
@@ -294,7 +300,13 @@ class Mail
                 $found = true;
             } elseif (strpos($stat, ': timeout waiting for input from ') === 0) {
                 $data['stat']['unavailable'][] = $to . ' - ' . $line;
-
+                $found = true;
+            } elseif (strpos($stat, 'STARTTLS: write error=syscall error') === 0) {
+                $data['stat']['unavailable'][] = $to . ' - ' . $line;
+                $found = true;
+            } elseif (strpos($stat, 'STARTTLS: read error=timeout') === 0) {
+                $data['stat']['unavailable'][] = $to . ' - ' . $line;
+                $found = true;
             }
 
             /**
