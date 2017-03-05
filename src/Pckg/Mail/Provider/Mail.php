@@ -11,26 +11,39 @@ class Mail extends Provider
     public function routes()
     {
         return [
-            'url' => [
-                '/mail/requestSend'     => [
-                    'controller' => MailController::class,
-                    'name'       => 'pckg.mail.requestSend',
-                    'view'       => 'requestSend',
-                ],
-                '/mail/[mail]/template' => [
-                    'controller' => MailController::class,
-                    'name'       => 'pckg.mail.template',
-                    'view'       => 'template',
-                    'resolvers'  => [
-                        'mail' => MailResolver::class,
-                    ],
-                ],
-                '/mail/parse-log'       => [
-                    'controller' => MailController::class,
-                    'name'       => 'pckg.mail.parseLog',
-                    'view'       => 'parseLog',
-                ],
-            ],
+            'url' => array_merge_array([
+                                           'tags' => [
+                                               'group:admin',
+                                           ],
+                                       ], [
+                                           '/mail/requestSend'     => [
+                                               'controller' => MailController::class,
+                                               'name'       => 'pckg.mail.requestSend',
+                                               'view'       => 'requestSend',
+                                               'tags'       => [
+                                                   'group:admin',
+                                               ],
+                                           ],
+                                           '/mail/[mail]/template' => [
+                                               'controller' => MailController::class,
+                                               'name'       => 'pckg.mail.template',
+                                               'view'       => 'template',
+                                               'resolvers'  => [
+                                                   'mail' => MailResolver::class,
+                                               ],
+                                               'tags'       => [
+                                                   'group:admin',
+                                               ],
+                                           ],
+                                           '/mail/parse-log'       => [
+                                               'controller' => MailController::class,
+                                               'name'       => 'pckg.mail.parseLog',
+                                               'view'       => 'parseLog',
+                                               'tags'       => [
+                                                   'group:admin',
+                                               ],
+                                           ],
+                                       ]),
         ];
     }
 
