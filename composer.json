@@ -1,6 +1,6 @@
 {
   "name": "pckg/mail",
-  "description": "Mail",
+  "description": "Sending mail via local mail server, smtp or api; global implementation of recipients and senders; subscriptions for mailchimp; made simple :)",
   "homepage": "https://github.com/pckg/mail",
   "license": "MIT",
   "authors": [
