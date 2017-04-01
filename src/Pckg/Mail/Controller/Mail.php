@@ -215,6 +215,9 @@ class Mail
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, ' (OK ') && strpos($stat, ' - gsmtp)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
+                } elseif (strpos($stat, 'Sent (Ok: queued on ') === 0 && strpos($stat, ' as ')) {
+                    $data['stat']['sent'][] = $to . ' - ' . $line;
+
                 } elseif (strpos($stat, 'Sent (OK id=') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
 
