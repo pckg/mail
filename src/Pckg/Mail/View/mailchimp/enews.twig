@@ -1,47 +1,3 @@
-<script>
-    $(document).ready(function(e) {
-        //validates form for e-news signup
-        $("#enews-form").validationEngine('attach',{scroll: false, onValidationComplete: function(form, status) {
-            if(status) {
-                var form = "#enews-form";
-
-                //disable sending button and replace text
-                $(form + " .button").val('{{ __('status_sending') }}').prop('disabled', true);
-
-                //remove any previous alert boxes
-                $(".form-newsletter .alert-danger").remove();
-
-                //post data
-                $.post("/add-mailchimp", $(form).serialize(), function(data){
-                    //recieve data
-                    data = fromJSON(data);
-
-                    //added successfully
-                    if (data.success != false) {
-                        $(form).slideUp();
-                        $(".form-newsletter .alert-success").slideDown();
-                    }
-                    //unable to add user
-                    else {
-                        //change button to resend
-                        $(form + " .button").prop('disabled', false).val('{{ __('btn_resend') }}');
-
-                        if(data.code == 214)
-                            $(form).slideUp();
-
-                        if(data.text)
-                            message = data.text;
-                        else
-                            message = '{{ __('notice_something_went_wrong') }}';
-
-                        var alertbox = $("<div class='alert alert-danger'>" + message + "</div>").hide();
-                        alertbox.appendTo($(".form-newsletter")).slideDown();
-                    }
-                });
-            }
-        }});
-    });
-</script>
 <div class="newsletter-opt-in newsletter-homepage newsletter-opt-in-module" id="newsletter-opt-in">
     <div class="clearfix"></div>
     <ul class="parallax pckg-parallax">
@@ -58,14 +14,7 @@
             </div>
 
             <div class="form-newsletter">
-                <form id="enews-form" name="enews-form">
-                    <div class="the-cloud" data-cloud-descr="{{ __('placeholder_email') }}" data-cloud-type="input">
-                        <input class="validate[required,custom[email]]" id="email" name="email" placeholder="{{ __('placeholder_email') }}" type="email" />
-                    </div>
-                    <div>
-                        <input class="button small" id="submitButton" type="submit" value="{{ __('btn_mailchimp_send') }}" />
-                    </div>
-                </form>
+                {{ enewsForm | raw }}
                 <div class="alert alert-success">
                     {{ __('mailchimp_success_index') }}
                 </div>
