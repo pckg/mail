@@ -36,7 +36,7 @@ class SendMail extends Command
                  [
                      'dump' => 'Dump instead of send?',
                  ],
-                 InputOption::VALUE_OPTIONAL
+                 InputOption::VALUE_NONE
              );
     }
 
