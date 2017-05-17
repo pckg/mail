@@ -6,10 +6,8 @@ use Exception;
 use Gnp\Mail\Entity\Mails;
 use Gnp\Mail\Record\MailsSent;
 use Pckg\Collection;
-use Pckg\Database\Repository;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class SendMail extends Command
@@ -103,6 +101,11 @@ class SendMail extends Command
                 },
                 $user->getLocale()
             );
+
+            if (isset($data['subject']) && isset($data['content'])) {
+                $mailService->body($data['content'])
+                            ->subject($data['subject']);
+            }
         } else {
             $mailService->subjectAndContent(
                 $data['subject'] ?? '',

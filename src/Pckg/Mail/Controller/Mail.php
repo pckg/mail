@@ -108,15 +108,9 @@ class Mail
                 $data['content'] = $template['content'];
 
                 /**
-                 * Put them to queue.
+                 * Put them to queue after document generation.
                  */
-                queue()->create(
-                    'mail:send',
-                    [
-                        'user' => $receiver,
-                        'data' => $data,
-                    ]
-                )->after($queue);
+                email($template['identifier'], $receiver, $data)->after($queue);
             }
         );
 

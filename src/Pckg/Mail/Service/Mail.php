@@ -38,10 +38,8 @@ class Mail
 
         if ($transportClass == Swift_MailTransport::class) {
             return new Swift_MailTransport();
-
         } else if ($transportClass == Swift_NullTransport::class) {
             return new Swift_NullTransport();
-
         }
 
         return new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
@@ -57,6 +55,13 @@ class Mail
     public function sender($email, $name = null)
     {
         $this->mail->setSender($email, $name);
+
+        return $this;
+    }
+
+    public function replyTo($email, $name = null)
+    {
+        $this->mail->setReplyTo($email, $name);
 
         return $this;
     }
@@ -105,7 +110,6 @@ class Mail
         $this->mail->setSubject($subject);
 
         return $this;
-
     }
 
     public function body($body)
@@ -113,7 +117,6 @@ class Mail
         $this->mail->setBody($body, 'text/html');
 
         return $this;
-
     }
 
     public function template($template, $data = [])
@@ -144,6 +147,10 @@ class Mail
              ->subject($subject);
 
         $this->fromSite();
+
+        if ($email->reply_to) {
+            $this->replyTo($email->reply_to, (new Site())->getFullName());
+        }
 
         return $this;
     }
@@ -177,7 +184,6 @@ class Mail
         $this->mail->addPart($body, 'text/plain');
 
         return $this;
-
     }
 
     public function attach($path, $mimeType = null, $name = null)
