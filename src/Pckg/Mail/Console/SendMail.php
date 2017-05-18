@@ -124,6 +124,7 @@ class SendMail extends Command
         /**
          * Add attachments.
          */
+        $attachmentsDump = '';
         if (isset($data['attach'])) {
             foreach ($data['attach'] as $key => $name) {
                 if ($key == 'estimate') {
@@ -140,8 +141,11 @@ class SendMail extends Command
                         null,
                         $name . '.pdf'
                     );
+                    $attachmentsDump[] = '<a href="/storage/private/' . config('app') . '/estimates/' . $name .
+                                         '.pdf">' . $name . '.pdf</a>';
                 }
             }
+            $attachmentsDump = '<br /><p>Attachments: ' . implode(', ', $attachmentsDump) . '</p>';
         }
 
         /**
@@ -149,7 +153,7 @@ class SendMail extends Command
          */
         if ($dump) {
             $path = path('tmp') . 'mails' . path('ds') . date('YmdHis') . '-' . sha1(microtime()) . '.html';
-            file_put_contents($path, $mailService->mail()->getBody());
+            file_put_contents($path, $mailService->mail()->getBody() . $attachmentsDump);
             $this->output('Dumped: ' . $path);
 
             return;
@@ -171,7 +175,7 @@ class SendMail extends Command
                     ? $mailTemplate->id
                     : null,
                 'subject'  => $mail->getSubject(),
-                'content'  => $mail->getBody(),
+                'content'  => $mail->getBody() . $attachmentsDump,
                 'from'     => (new Collection($mail->getFrom()))->map(
                     function($name, $mail) {
                         return $name . ' <' . $mail . '>';

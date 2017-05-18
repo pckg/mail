@@ -54,7 +54,6 @@ class Mail
                     $user = (new Users())->where('id', $recipient['id'])->one();
                     $receiver = new User($user);
                     $data['fetch']['user'][Users::class] = $user->id;
-
                 } else if ($recipient['type'] == 'orderUser') {
                     $orderUser = (new OrdersUsers())->where('id', $recipient['id'])->one();
                     $receiver = new User($orderUser->user);
@@ -63,17 +62,14 @@ class Mail
                     $data['fetch']['offer'][Offers::class] = $orderUser->order->offer_id;
                     $data['fetch']['user'][Users::class] = $orderUser->user_id;
                     $order = $orderUser->order;
-
                 } else if ($recipient['type'] == 'order') {
                     $order = (new Orders())->where('id', $recipient['id'])->one();
                     $receiver = new User($order->user);
                     $data['fetch']['order'][Orders::class] = $order->id;
                     $data['fetch']['user'][Users::class] = $order->user_id;
                     $data['fetch']['offer'][Offers::class] = $order->offer_id;
-
                 } else {
                     throw new Exception("Unknown recipient type");
-
                 }
 
                 if (!$receiver) {
@@ -104,8 +100,12 @@ class Mail
                 /**
                  * Set subject and content, they will be parsed later ...
                  */
-                $data['subject'] = $template['subject'];
-                $data['content'] = $template['content'];
+                if (isset($template['subject'])) {
+                    $data['subject'] = $template['subject'];
+                }
+                if (isset($template['content'])) {
+                    $data['content'] = $template['content'];
+                }
 
                 /**
                  * Put them to queue after document generation.
@@ -193,72 +193,50 @@ class Mail
                 $stat = substr($line, $statStart);
                 if (in_array($stat, ['Sent', 'Sent (ok dirdel)', 'Sent (Queued!)', 'Sent (Ok.)'])) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Message accepted for delivery')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (Requested mail action okay, completed: id=') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (<') === 0 && strpos($stat, '> Mail accepted)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (') === 0 && strpos($stat, ' accepted message ')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, ' (OK ') && strpos($stat, ' - gsmtp)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (Ok: queued on ') === 0 && strpos($stat, ' as ')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (OK id=') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (ok ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (ok:  Message ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent') === 0 && strpos($stat, 'Queued mail for delivery)')) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (2.0.0 Ok: queued as ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (2.0.0 Ok: queued as ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (Ok: queued as ') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Sent (Message Queued (') === 0) {
                     $data['stat']['sent'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Deferred: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Host unknown (Name server: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Deferred') === 0 && strpos($stat, 'greylist')) {
                     $data['stat']['graylist'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, ': sender notify: Cannot send message for ') === 0) {
                     $data['stat']['graylist'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
-
                 } elseif (in_array($stat, ['User unknown', 'Unknown'])) {
                     $data['stat']['unknownUser'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Please try again later') > 0
                           || strpos($stat, 'Please try again later') === 0
                 ) {
                     $data['stat']['later'][] = $to . ' - ' . $line;
-
                 } else {
                     d("Stat", $line, $stat);
                 }
@@ -268,13 +246,10 @@ class Mail
                 $stat = substr($line, $statStart);
                 if (strpos($stat, 'User unknown') === 0) {
                     $data['stat']['unknownUser'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Service unavailable') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
-
                 } elseif (strpos($stat, 'Host unknown (Name server: ') === 0) {
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
-
                 } else {
                     d("Stat2", $line, $stat);
                 }
@@ -284,7 +259,6 @@ class Mail
                 $stat = substr($line, $statStart);
                 if (strpos($stat, 'Please try again later')) {
                     $data['stat']['later'][] = $to . ' - ' . $line;
-
                 } else {
                     d("Stat3", $line, $stat);
                 }
@@ -368,7 +342,6 @@ class Mail
 
             if (!$found && $line) {
                 d("Unknown", $line);
-
             }
         }
 
