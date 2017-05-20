@@ -100,12 +100,12 @@ class Mail
                 /**
                  * Set subject and content, they will be parsed later ...
                  */
-                if (isset($template['subject'])) {
+                /*if (isset($template['subject'])) {
                     $data['subject'] = $template['subject'];
                 }
                 if (isset($template['content'])) {
                     $data['content'] = $template['content'];
-                }
+                }*/
 
                 /**
                  * Put them to queue after document generation.

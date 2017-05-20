@@ -101,12 +101,9 @@ class SendMail extends Command
                 },
                 $user->getLocale()
             );
+        }
 
-            if (isset($data['subject']) && isset($data['content'])) {
-                $mailService->body($data['content'])
-                            ->subject($data['subject']);
-            }
-        } else {
+        if (!$template || (isset($data['subject']) && isset($data['content']))) {
             $mailService->subjectAndContent(
                 $data['subject'] ?? '',
                 $data['content'] ?? '',
