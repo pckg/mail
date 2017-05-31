@@ -149,8 +149,13 @@ class SendMail extends Command
          * Check for errors.
          */
         $checks = [$mailService->mail()->getBody(), $mailService->mail()->getSubject()];
+        $excStr = 'an exception has been thrown during the rendering of a template';
+        $onLineStr = 'at line';
         foreach ($checks as $check) {
-            if (strpos(strtolower($check), '__string_template__')) {
+            $lower = strtolower($check);
+            if (strpos($lower, $excStr)) {
+                throw new Exception('Error parsing template, exception: ' . strbetween($check, $excStr, $onLineStr));
+            } else if (strpos($lower, '__string_template__')) {
                 throw new Exception('Error parsing template, found __string_template__');
             }
         }
