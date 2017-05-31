@@ -146,6 +146,16 @@ class SendMail extends Command
         }
 
         /**
+         * Check for errors.
+         */
+        $checks = [$mailService->mail()->getBody(), $mailService->mail()->getSubject()];
+        foreach ($checks as $check) {
+            if (strpos(strtolower($check), '__string_template__')) {
+                throw new Exception('Error parsing template, found __string_template__');
+            }
+        }
+
+        /**
          * Send email.
          */
         if ($dump) {
