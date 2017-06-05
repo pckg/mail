@@ -125,7 +125,7 @@ class Mail
                 /**
                  * Handle offers.
                  */
-                $data['afterContent'] = $offersHtml;
+                $data['data']['afterContent'] = $offersHtml;
 
                 /**
                  * Set subject and content, they will be parsed later ...
