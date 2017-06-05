@@ -43,8 +43,26 @@ class Mail
         $attachments = new Collection($this->post('attachments'));
         $template = $this->post('mail');
 
+        /**
+         * Send only 1 mail in test mode.
+         */
+        $test = $this->post('test');
+        if ($test) {
+            $recipients = $recipients->slice(0, 1);
+        }
+
+        /**
+         * Append offers for newsletters.
+         */
+        $offers = $this->post('offers');
+        $offersHtml = null;
+        if ($offers) {
+            $offersHtml = view('Pckg/Mail:offers',
+                               ['offers' => (new Offers())->where('id', $offers)->all()])->autoparse();
+        }
+
         $recipients->each(
-            function($recipient) use ($attachments, $template, $mail) {
+            function($recipient) use ($attachments, $template, $mail, $test, $offersHtml) {
                 $data = [];
                 /**
                  * Handle fetches.
@@ -72,6 +90,13 @@ class Mail
                     throw new Exception("Unknown recipient type");
                 }
 
+                /**
+                 * Test mail is always sent to current logged-in user.
+                 */
+                if ($test) {
+                    $receiver = new User($this->auth()->getUser());
+                }
+
                 if (!$receiver) {
                     throw new Exception("No receiver");
                 }
@@ -96,6 +121,11 @@ class Mail
                         $data['attach'][$document] = __('document.' . $document . '.title', ['order' => $order]);
                     }
                 }
+
+                /**
+                 * Handle offers.
+                 */
+                $data['afterContent'] = $offersHtml;
 
                 /**
                  * Set subject and content, they will be parsed later ...
