@@ -57,8 +57,9 @@ class Mail
         $offers = $this->post('offers');
         $offersHtml = null;
         if ($offers) {
-            $offersHtml = view('Pckg/Mail:offers',
-                               ['offers' => (new Offers())->where('id', $offers)->all()])->autoparse();
+            $offersHtml = view('Pckg/Mail:offers', [
+                'offers' => (new Offers())->where('id', $offers)->all(),
+            ])->autoparse();
         }
 
         $recipients->each(
