@@ -123,7 +123,7 @@ class SendMail extends Command
          * Add attachments.
          */
         $eventData = array_merge($realData, [
-            'attachments' => $data['attach'],
+            'attachments' => $data['attach'] ?? [],
             'mailService' => $mailService,
             'template'    => $template,
         ]);
