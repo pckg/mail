@@ -42,6 +42,7 @@ class Mail
         $recipients = new Collection($this->post('recipients'));
         $attachments = new Collection($this->post('attachments'));
         $template = $this->post('mail');
+        $throttle = $this->post('throttle');
 
         /**
          * Send only 1 mail in test mode.
@@ -61,7 +62,7 @@ class Mail
         }
 
         $recipients->each(
-            function($recipient) use ($attachments, $template, $mail, $test, $offersHtml) {
+            function($recipient) use ($attachments, $template, $mail, $test, $offersHtml, $throttle) {
                 $data = [];
                 /**
                  * Handle fetches.
@@ -103,20 +104,8 @@ class Mail
                 /**
                  * Handle attachments.
                  */
-                $queue = null;
                 foreach (['estimate', 'bill', 'voucher'] as $document) {
                     if ($attachments->has($document)) {
-                        /**
-                         * If document isn't generated yet, generate it first.
-                         */
-                        if (!$order->{$document . '_url'}) {
-                            $queue = queue()->create(
-                                $document . ':generate',
-                                [
-                                    'orders' => $order->id,
-                                ]
-                            )->after($queue);
-                        }
                         $data['attach'][$document] = __('document.' . $document . '.title', ['order' => $order]);
                     }
                 }
@@ -127,19 +116,12 @@ class Mail
                 $data['data']['afterContent'] = $offersHtml;
 
                 /**
-                 * Set subject and content, they will be parsed later ...
-                 */
-                /*if (isset($template['subject'])) {
-                    $data['subject'] = $template['subject'];
-                }
-                if (isset($template['content'])) {
-                    $data['content'] = $template['content'];
-                }*/
-
-                /**
                  * Put them to queue after document generation.
                  */
-                email($template['identifier'], $receiver, $data)->after($queue);
+                $queue = email($template['identifier'], $receiver, $data);
+                if ($throttle) {
+                    $queue->makeTimeoutAfterLast('mail:send', '+2seconds');
+                }
             }
         );
 
