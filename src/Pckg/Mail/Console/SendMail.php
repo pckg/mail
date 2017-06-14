@@ -125,7 +125,7 @@ class SendMail extends Command
         /**
          * Add attachments.
          */
-        $attachmentsDump = '';
+        $attachmentsDump = [];
         if (isset($data['attach'])) {
             foreach ($data['attach'] as $key => $name) {
                 if ($key == 'estimate') {
@@ -144,10 +144,25 @@ class SendMail extends Command
                     );
                     $attachmentsDump[] = '<a href="/storage/private/' . config('app') . '/estimates/' . $name .
                                          '.pdf">' . $name . '.pdf</a>';
+                } elseif ($key == 'voucher') {
+                    if (!$realData['order']->voucher_url) {
+                        $realData['order']->generateVoucher();
+                    }
+
+                    /**
+                     * Attach voucher.
+                     */
+                    $mailService->attach(
+                        $realData['order']->getAbsoluteVoucherUrlAttribute(),
+                        null,
+                        $name . '.pdf'
+                    );
+                    $attachmentsDump[] = '<a href="/storage/private/' . config('app') . '/vouchers/' . $name .
+                                         '.pdf">' . $name . '.pdf</a>';
                 }
             }
-            $attachmentsDump = '<br /><p>Attachments: ' . implode(', ', $attachmentsDump) . '</p>';
         }
+        $attachmentsDump = '<br /><p>Attachments: ' . implode(', ', $attachmentsDump) . '</p>';
 
         /**
          * Check for errors.
