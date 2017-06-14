@@ -5,7 +5,7 @@ use Derive\User\Service\Mail\Site;
 use Gnp\Mail\Entity\Mails;
 use Pckg\Framework\Exception\NotFound;
 use Pckg\Framework\View\Twig;
-use Swift_Attachment;
+use Pckg\Mail\Service\Mail\Attachment;
 use Swift_Mailer;
 use Swift_MailTransport;
 use Swift_Message;
@@ -180,7 +180,13 @@ class Mail
 
     public function attach($path, $mimeType = null, $name = null)
     {
-        $this->mail->attach(Swift_Attachment::fromPath($path, $mimeType)->setFilename($name));
+        if (!$mimeType) {
+            if (strpos($path, '.pdf')) {
+                $mimeType = 'application/pdf';
+            }
+        }
+
+        $this->mail->attach(Attachment::fromPath($path, $mimeType)->setFilename($name));
 
         return $this;
     }

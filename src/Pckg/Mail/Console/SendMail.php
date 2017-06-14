@@ -3,9 +3,6 @@
 use Derive\Orders\Entity\Users;
 use Derive\User\Service\Mail\User;
 use Exception;
-use Gnp\Mail\Entity\Mails;
-use Gnp\Mail\Record\MailsSent;
-use Pckg\Collection;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
 use Symfony\Component\Console\Input\InputOption;
@@ -125,47 +122,14 @@ class SendMail extends Command
         /**
          * Add attachments.
          */
-        $attachmentsDump = [];
+        $eventData = array_merge($realData, [
+            'attachments' => $data['attach'],
+            'mailService' => $mailService,
+            'template'    => $template,
+        ]);
         if (isset($data['attach'])) {
-            foreach ($data['attach'] as $key => $name) {
-                if ($key == 'estimate') {
-                    /**
-                     * Estimate is generated each time it's attached.
-                     */
-                    $realData['order']->generateEstimate();
-
-                    /**
-                     * Attach estimate.
-                     */
-                    $mailService->attach(
-                        $realData['order']->getAbsoluteEstimateUrlAttribute(),
-                        null,
-                        $name . '.pdf'
-                    );
-                    $attachmentsDump[] = '<a href="/storage/private/' . config('app') . '/estimates/' . $name .
-                                         '.pdf">' . $name . '.pdf</a>';
-                } elseif ($key == 'voucher') {
-                    if (!$realData['order']->voucher_url) {
-                        $realData['order']->generateVoucher();
-                    }
-
-                    /**
-                     * Attach voucher.
-                     */
-                    $mailService->attach(
-                        $realData['order']->getAbsoluteVoucherUrlAttribute(),
-                        null,
-                        $name . '.pdf'
-                    );
-                    $attachmentsDump[] = '<a href="/storage/private/' . config('app') . '/vouchers/' . $name .
-                                         '.pdf">' . $name . '.pdf</a>';
-                }
-            }
+            trigger(SendMail::class . '.processAttachments', $eventData);
         }
-
-        $attachmentsDump = $attachmentsDump
-            ? '<br /><p>Attachments: ' . implode(', ', $attachmentsDump) . '</p>'
-            : '';
 
         /**
          * Check for errors.
@@ -186,8 +150,8 @@ class SendMail extends Command
          * Send email.
          */
         if ($dump) {
-            $path = path('tmp') . 'mails' . path('ds') . date('YmdHis') . '-' . sha1(microtime()) . '.html';
-            file_put_contents($path, $mailService->mail()->getBody() . $attachmentsDump);
+            $path = path('tmp') . 'maildump_' . date('YmdHis') . '_' . sha1(microtime()) . '.html';
+            file_put_contents($path, $mailService->mail()->getBody());
             $this->output('Dumped: ' . $path);
 
             return;
@@ -198,31 +162,7 @@ class SendMail extends Command
         /**
          * Save log.
          */
-        $mailTemplate = null;
-        if ($template) {
-            $mailTemplate = (new Mails())->where('identifier', $template)->one();
-        }
-        $mail = $mailService->mail();
-        MailsSent::create(
-            [
-                'mail_id'  => $mailTemplate
-                    ? $mailTemplate->id
-                    : null,
-                'subject'  => $mail->getSubject(),
-                'content'  => $mail->getBody() . $attachmentsDump,
-                'from'     => (new Collection($mail->getFrom()))->map(
-                    function($name, $mail) {
-                        return $name . ' <' . $mail . '>';
-                    }
-                )->implode(', ', ' and '),
-                'to'       => (new Collection($mail->getTo()))->map(
-                    function($name, $mail) {
-                        return $name . ' <' . $mail . '>';
-                    }
-                )->implode(', ', ' and '),
-                'datetime' => date('Y-m-d H:i:s'),
-            ]
-        );
+        trigger(SendMail::class . '.mailSent', $eventData);
 
         $this->output('Mail sent!');
     }
