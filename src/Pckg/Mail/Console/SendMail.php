@@ -162,7 +162,10 @@ class SendMail extends Command
                 }
             }
         }
-        $attachmentsDump = '<br /><p>Attachments: ' . implode(', ', $attachmentsDump) . '</p>';
+
+        $attachmentsDump = $attachmentsDump
+            ? '<br /><p>Attachments: ' . implode(', ', $attachmentsDump) . '</p>'
+            : '';
 
         /**
          * Check for errors.
