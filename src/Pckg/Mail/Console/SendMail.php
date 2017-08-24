@@ -97,8 +97,8 @@ class SendMail extends Command
                 $locale = $realData['order']->getLocale();
             }
             runInLocale(
-                function() use ($template, $mailService, $realData) {
-                    $mailService->template($template, $realData);
+                function() use ($template, $mailService, $realData, $data) {
+                    $mailService->template($template, $realData, $data);
                 },
                 $locale
             );

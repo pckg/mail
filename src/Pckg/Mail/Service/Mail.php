@@ -120,7 +120,7 @@ class Mail
         return $this;
     }
 
-    public function template($template, $data = [])
+    public function template($template, $data = [], $fulldata = [])
     {
         $email = (new Mails())->where('identifier', $template)
                               ->joinFallbackTranslation()
@@ -130,8 +130,8 @@ class Mail
                                   }
                               );
 
-        $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
-        $content = (new Twig(null, $data))->setTemplate($email->content)->autoparse();
+        $subject = (new Twig(null, $data))->setTemplate($fulldata['subject'] ?? $email->subject)->autoparse();
+        $content = (new Twig(null, $data))->setTemplate($fulldata['content'] ?? $email->content)->autoparse();
 
         $data = array_merge($data, [
             'subject' => $subject,
