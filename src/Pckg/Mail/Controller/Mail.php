@@ -44,6 +44,7 @@ class Mail
         $template = $this->post('mail');
         $throttle = $this->post('throttle');
         $receiverType = $this->post('receiverType');
+        $type = $this->post('type');
 
         /**
          * Send only 1 mail in test mode.
@@ -63,7 +64,9 @@ class Mail
         }
 
         $recipients->each(
-            function($recipient) use ($attachments, $template, $mail, $test, $offersHtml, $throttle, $receiverType) {
+            function($recipient) use (
+                $attachments, $template, $mail, $test, $offersHtml, $throttle, $receiverType, $type
+            ) {
                 $data = [];
                 /**
                  * Handle fetches.
@@ -109,6 +112,15 @@ class Mail
                     if ($attachments->has($document)) {
                         $data['attach'][$document] = __('document.' . $document . '.title', ['order' => $order]);
                     }
+                }
+
+                /**
+                 * Handle custom newsletter.
+                 */
+                if ($type == 'newsletter') {
+                    $content = post('mail');
+                    $data['data']['content'] = $content['content'];
+                    $data['data']['subject'] = $content['subject'];
                 }
 
                 /**
