@@ -133,7 +133,12 @@ class Mail
         $subject = (new Twig(null, $data))->setTemplate($email->subject)->autoparse();
         $content = (new Twig(null, $data))->setTemplate($email->content)->autoparse();
 
-        $data = array_merge($data, ['subject' => $subject, 'content' => $content, 'type' => $email->type]);
+        $data = array_merge($data, [
+            'subject' => $subject,
+            'content' => $content,
+            'type'    => $email->type,
+            'css'     => (new GetLessVariables())->execute(),
+        ]);
         $body = view('Pckg/Mail:layout', $data)->autoparse();
 
         $this->body($body)
