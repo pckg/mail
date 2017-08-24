@@ -130,8 +130,8 @@ class Mail
                                   }
                               );
 
-        $subject = (new Twig(null, $data))->setTemplate($fulldata['subject'] ?? $email->subject)->autoparse();
-        $content = (new Twig(null, $data))->setTemplate($fulldata['content'] ?? $email->content)->autoparse();
+        $subject = (new Twig(null, $data))->setTemplate($fulldata['data']['subject'] ?? $email->subject)->autoparse();
+        $content = (new Twig(null, $data))->setTemplate($fulldata['data']['content'] ?? $email->content)->autoparse();
 
         $data = array_merge($data, [
             'subject' => $subject,
