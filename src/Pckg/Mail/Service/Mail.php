@@ -1,5 +1,6 @@
 <?php namespace Pckg\Mail\Service;
 
+use Derive\Layout\Command\GetLessVariables;
 use Derive\User\Service\Mail\Admin;
 use Derive\User\Service\Mail\Site;
 use Gnp\Mail\Entity\Mails;
@@ -159,6 +160,7 @@ class Mail
                 [
                     'subject' => $subject,
                     'content' => $content,
+                    'css'     => (new GetLessVariables())->execute(),
                 ]
             )
         )->autoparse();
