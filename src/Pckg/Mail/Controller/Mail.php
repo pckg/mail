@@ -40,7 +40,7 @@ class Mail
     public function postRequestSendAction(MailRecord $mail)
     {
         $recipients = new Collection(explode(',', $this->post('recipients')));
-        $attachments = new Collection($this->post('attachments'));
+        $attachments = new Collection($this->post('attachments', []));
         $template = $this->post('mail');
         $throttle = $this->post('throttle');
         $receiverType = $this->post('receiverType');
