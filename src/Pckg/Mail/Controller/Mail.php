@@ -39,10 +39,11 @@ class Mail
      */
     public function postRequestSendAction(MailRecord $mail)
     {
-        $recipients = new Collection($this->post('recipients'));
+        $recipients = new Collection(explode(',', $this->post('recipients')));
         $attachments = new Collection($this->post('attachments'));
         $template = $this->post('mail');
         $throttle = $this->post('throttle');
+        $receiverType = $this->post('receiverType');
 
         /**
          * Send only 1 mail in test mode.
@@ -62,26 +63,26 @@ class Mail
         }
 
         $recipients->each(
-            function($recipient) use ($attachments, $template, $mail, $test, $offersHtml, $throttle) {
+            function($recipient) use ($attachments, $template, $mail, $test, $offersHtml, $throttle, $receiverType) {
                 $data = [];
                 /**
                  * Handle fetches.
                  */
                 $order = null;
-                if ($recipient['type'] == 'user') {
-                    $user = (new Users())->where('id', $recipient['id'])->one();
+                if ($receiverType == 'user') {
+                    $user = (new Users())->where('id', $recipient)->one();
                     $receiver = new User($user);
                     $data['fetch']['user'][Users::class] = $user->id;
-                } else if ($recipient['type'] == 'orderUser') {
-                    $orderUser = (new OrdersUsers())->where('id', $recipient['id'])->one();
+                } else if ($receiverType == 'orderUser') {
+                    $orderUser = (new OrdersUsers())->where('id', $recipient)->one();
                     $receiver = new User($orderUser->user);
                     $data['fetch']['orderUser'][OrdersUsers::class] = $orderUser->id;
                     $data['fetch']['order'][Orders::class] = $orderUser->order_id;
                     $data['fetch']['offer'][Offers::class] = $orderUser->order->offer_id;
                     $data['fetch']['user'][Users::class] = $orderUser->user_id;
                     $order = $orderUser->order;
-                } else if ($recipient['type'] == 'order') {
-                    $order = (new Orders())->where('id', $recipient['id'])->one();
+                } else if ($receiverType == 'order') {
+                    $order = (new Orders())->where('id', $recipient)->one();
                     $receiver = new User($order->user);
                     $data['fetch']['order'][Orders::class] = $order->id;
                     $data['fetch']['user'][Users::class] = $order->user_id;
