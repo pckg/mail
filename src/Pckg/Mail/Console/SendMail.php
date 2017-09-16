@@ -3,6 +3,7 @@
 use Derive\Orders\Entity\Users;
 use Derive\User\Service\Mail\User;
 use Exception;
+use Gnp\Mail\Record\MailsSent;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
 use Symfony\Component\Console\Input\InputOption;
@@ -81,6 +82,8 @@ class SendMail extends Command
         /**
          * Create recipient.
          */
+        $email = null;
+        $fullName = null;
         if (is_object($user)) {
             $email = $user->getEmail();
             $fullName = $user->getFullName();
@@ -122,10 +125,12 @@ class SendMail extends Command
         /**
          * Add attachments.
          */
+        $mailsSent = MailsSent::create();
         $eventData = array_merge($realData, [
             'attachments' => $data['attach'] ?? [],
             'mailService' => $mailService,
             'template'    => $template,
+            'mailsSent'   => $mailsSent,
         ]);
         if (isset($data['attach'])) {
             trigger(SendMail::class . '.processAttachments', $eventData);
@@ -145,6 +150,11 @@ class SendMail extends Command
                 throw new Exception('Error parsing template, found __string_template__');
             }
         }
+
+        /**
+         * Create log.
+         */
+        trigger(SendMail::class . '.sendingMail', $eventData);
 
         /**
          * Send email.
