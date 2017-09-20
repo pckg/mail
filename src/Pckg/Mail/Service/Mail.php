@@ -137,7 +137,7 @@ class Mail
             'subject' => $subject,
             'content' => $content,
             'type'    => $email->type,
-            'css'     => (new GetLessVariables())->execute(),
+            'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
         ]);
         $body = view('Pckg/Mail:layout', $data)->autoparse();
 
@@ -165,7 +165,7 @@ class Mail
                 [
                     'subject' => $subject,
                     'content' => $content,
-                    'css'     => (new GetLessVariables())->execute(),
+                    'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
                 ]
             )
         )->autoparse();
