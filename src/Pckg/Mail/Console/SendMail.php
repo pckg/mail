@@ -43,7 +43,7 @@ class SendMail extends Command
         $dump = $this->option('dump');
         $data = (array)json_decode($this->option('data'), true);
         $realData = [];
-        
+
         if (!empty($data['data'])) {
             $realData = $data['data'];
         }
