@@ -1,11 +1,11 @@
 <?php namespace Pckg\Mail\Console;
 
-use Pckg\Auth\Entity\Users;
-use Pckg\Mail\Service\Mail\Adapter\User;
 use Exception;
 use Gnp\Mail\Record\MailsSent;
+use Pckg\Auth\Entity\Users;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
+use Pckg\Mail\Service\Mail\Adapter\User;
 use Symfony\Component\Console\Input\InputOption;
 
 class SendMail extends Command
@@ -126,7 +126,7 @@ class SendMail extends Command
         /**
          * Add attachments.
          */
-        $mailsSent = MailsSent::create();
+        $mailsSent = class_exists(MailsSent::class) ? MailsSent::create() : null;
         $eventData = array_merge($realData, [
             'attachments' => $data['attach'] ?? [],
             'mailService' => $mailService,
