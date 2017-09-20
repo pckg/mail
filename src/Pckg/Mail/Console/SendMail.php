@@ -1,6 +1,6 @@
 <?php namespace Pckg\Mail\Console;
 
-use Derive\Orders\Entity\Users;
+use Pckg\Auth\Entity\Users;
 use Derive\User\Service\Mail\User;
 use Exception;
 use Gnp\Mail\Record\MailsSent;
