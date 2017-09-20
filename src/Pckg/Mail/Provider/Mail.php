@@ -54,4 +54,9 @@ class Mail extends Provider
         ];
     }
 
+    public function paths()
+    {
+        return $this->getViewPaths();
+    }
+
 }
