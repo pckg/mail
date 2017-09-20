@@ -1,7 +1,7 @@
 <?php namespace Pckg\Mail\Service;
 
 use Derive\Layout\Command\GetLessVariables;
-use Derive\User\Service\Mail\Admin;
+use Pckg\Mail\Service\Mail\Adapter\Admin;
 use Pckg\Mail\Service\Mail\Adapter\Site;
 use Gnp\Mail\Entity\Mails;
 use Pckg\Framework\Exception\NotFound;
