@@ -13,11 +13,19 @@ class Command implements HandlerInterface
      */
     public function send($template, $receiver, $data = [])
     {
-        (new SendMail())->executeManually([
-                                              'user'     => $receiver,
-                                              'template' => $template,
-                                              'data'     => $data,
-                                          ]);
+        $params = [
+            'user' => $receiver,
+            'data' => $data,
+        ];
+
+        if (is_string($template)) {
+            $params['template'] = $template;
+        } else {
+            $params['data']['subject'] = $template['subject'];
+            $params['data']['content'] = $template['content'];
+        }
+
+        (new SendMail())->executeManually($params);
     }
 
 }
