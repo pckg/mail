@@ -1,7 +1,7 @@
 <?php namespace Pckg\Mail\Console;
 
 use Pckg\Auth\Entity\Users;
-use Derive\User\Service\Mail\User;
+use Pckg\Mail\Service\Mail\Adapter\User;
 use Exception;
 use Gnp\Mail\Record\MailsSent;
 use Pckg\Framework\Console\Command;
@@ -43,6 +43,7 @@ class SendMail extends Command
         $dump = $this->option('dump');
         $data = (array)json_decode($this->option('data'), true);
         $realData = [];
+        
         if (!empty($data['data'])) {
             $realData = $data['data'];
         }
