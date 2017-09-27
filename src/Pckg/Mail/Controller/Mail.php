@@ -9,6 +9,7 @@ use Exception;
 use Gnp\Mail\Record\Mail as MailRecord;
 use Pckg\Collection;
 use Pckg\Framework\Helper\Traits;
+use Pckg\Queue\Record\Queue;
 
 class Mail
 {
@@ -42,7 +43,6 @@ class Mail
         $recipients = new Collection(explode(',', $this->post('recipients')));
         $attachments = new Collection($this->post('attachments', []));
         $template = $this->post('mail');
-        $throttle = $this->post('throttle');
         $receiverType = $this->post('receiverType');
         $type = $this->post('type');
 
@@ -65,7 +65,7 @@ class Mail
 
         $recipients->each(
             function($recipient) use (
-                $attachments, $template, $mail, $test, $offersHtml, $throttle, $receiverType, $type
+                $attachments, $template, $mail, $test, $offersHtml, $receiverType, $type, $recipients
             ) {
                 $data = [];
                 /**
@@ -129,10 +129,10 @@ class Mail
                 $data['data']['afterContent'] = $offersHtml;
 
                 /**
-                 * Put them to queue after document generation.
+                 * Put non-campaign mails to queue after document generation.
                  */
                 $queue = email($template['identifier'], $receiver, $data);
-                if ($throttle) {
+                if ($queue instanceof Queue) {
                     $queue->makeTimeoutAfterLast('mail:send', '+2seconds');
                 }
             }

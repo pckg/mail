@@ -65,7 +65,7 @@ class SendMail extends Command
              * Receive user from database.
              */
             $user = new User((new Users())->where('id', $user)->oneOrFail());
-        } else {
+        } elseif (!is_object($user)) {
             /**
              * Object was passed.
              */
@@ -176,6 +176,8 @@ class SendMail extends Command
         trigger(SendMail::class . '.mailSent', $eventData);
 
         $this->output('Mail sent!');
+
+        return $eventData;
     }
 
 }
