@@ -1,5 +1,6 @@
 <?php namespace Pckg\Mail\Controller;
 
+use Derive\Inquiry\Entity\Inquiries;
 use Derive\Offers\Entity\Offers;
 use Derive\Orders\Entity\Orders;
 use Derive\Orders\Entity\OrdersUsers;
@@ -9,6 +10,7 @@ use Exception;
 use Gnp\Mail\Record\Mail as MailRecord;
 use Pckg\Collection;
 use Pckg\Framework\Helper\Traits;
+use Pckg\Mail\Service\Mail\Adapter\SimpleUser;
 use Pckg\Queue\Record\Queue;
 
 class Mail
@@ -90,6 +92,10 @@ class Mail
                     $data['fetch']['order'][Orders::class] = $order->id;
                     $data['fetch']['user'][Users::class] = $order->user_id;
                     $data['fetch']['offer'][Offers::class] = $order->offer_id;
+                } else if ($receiverType == 'inquiry') {
+                    $inquiry = (new Inquiries())->where('id', $recipient)->one();
+                    $receiver = new SimpleUser($inquiry->email, $inquiry->name, $inquiry->surname);
+                    $data['fetch']['inquiry'][Inquiries::class] = $inquiry->id;
                 } else {
                     throw new Exception("Unknown recipient type");
                 }
