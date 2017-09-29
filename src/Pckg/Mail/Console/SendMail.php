@@ -149,6 +149,8 @@ class SendMail extends Command
                 throw new Exception('Error parsing template, exception: ' . strbetween($check, $excStr, $onLineStr));
             } else if (strpos($lower, '__string_template__')) {
                 throw new Exception('Error parsing template, found __string_template__');
+            } else if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
+                throw new Exception('Error parsing template, found php error');
             }
         }
 
