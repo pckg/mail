@@ -177,6 +177,11 @@ class SendMail extends Command
          */
         trigger(SendMail::class . '.mailSent', $eventData);
 
+        $triggers = $data['trigger'] ?? [];
+        foreach ($triggers as $event => $load) {
+            trigger($event, unserialize(base64_decode($load)));
+        }
+
         $this->output('Mail sent!');
 
         return $eventData;

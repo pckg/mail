@@ -1,6 +1,7 @@
 <?php namespace Pckg\Mail\Controller;
 
 use Derive\Inquiry\Entity\Inquiries;
+use Derive\Inquiry\Record\Inquiry;
 use Derive\Offers\Entity\Offers;
 use Derive\Orders\Entity\Orders;
 use Derive\Orders\Entity\OrdersUsers;
@@ -96,6 +97,7 @@ class Mail
                     $inquiry = (new Inquiries())->where('id', $recipient)->one();
                     $receiver = new SimpleUser($inquiry->email, $inquiry->name, $inquiry->surname);
                     $data['fetch']['inquiry'][Inquiries::class] = $inquiry->id;
+                    $data['trigger'][Inquiry::class . '.responded'] = [$inquiry];
                 } else {
                     throw new Exception("Unknown recipient type");
                 }
