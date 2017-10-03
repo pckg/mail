@@ -179,7 +179,7 @@ class SendMail extends Command
 
         $triggers = $data['trigger'] ?? [];
         foreach ($triggers as $event => $load) {
-            trigger($event, unserialize(base64_decode($load)));
+            trigger($event, $realData[$load]);
         }
 
         $this->output('Mail sent!');
