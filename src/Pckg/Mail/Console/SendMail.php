@@ -23,6 +23,10 @@ class SendMail extends Command
                  ],
                  InputOption::VALUE_REQUIRED
              )
+             ->addOptions([
+                              'content' => 'Mail content',
+                              'subject' => 'Mail subject',
+                          ], InputOption::VALUE_REQUIRED)
              ->addOptions(
                  [
                      'template-required' => '',
@@ -41,6 +45,8 @@ class SendMail extends Command
         $template = $this->option('template');
         $user = $this->option('user');
         $dump = $this->option('dump');
+        $subject = $this->option('subject');
+        $content = $this->option('content');
         $data = (array)json_decode($this->option('data'), true);
         $realData = [];
 
@@ -108,7 +114,13 @@ class SendMail extends Command
             );
         }
 
-        if (!$template || (isset($data['subject']) && isset($data['content']))) {
+        if ($subject && $content) {
+            $mailService->subjectAndContent(
+                $subject,
+                $content,
+                $realData
+            );
+        } elseif (!$template || (isset($data['subject']) && isset($data['content']))) {
             $mailService->subjectAndContent(
                 $data['subject'] ?? '',
                 $data['content'] ?? '',
