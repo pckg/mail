@@ -14,15 +14,15 @@ class Command implements HandlerInterface
     public function send($template, $receiver, $data = [])
     {
         $params = [
-            'user' => $receiver,
-            'data' => $data,
+            '--user' => $receiver,
+            '--data' => $data,
         ];
 
         if (is_string($template)) {
-            $params['template'] = $template;
+            $params['--template'] = $template;
         } else {
-            $params['data']['subject'] = $template['subject'];
-            $params['data']['content'] = $template['content'];
+            $params['--data']['subject'] = $template['subject'];
+            $params['--data']['content'] = $template['content'];
         }
 
         (new SendMail())->executeManually($params);
