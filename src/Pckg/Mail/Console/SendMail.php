@@ -152,7 +152,9 @@ class SendMail extends Command
         $onLineStr = 'at line';
         foreach ($checks as $check) {
             $lower = strtolower($check);
-            if (strpos($lower, $excStr)) {
+            if (!$lower) {
+                throw new Exception('Empty subject or content');
+            } else if (strpos($lower, $excStr)) {
                 throw new Exception('Error parsing template, exception: ' . strbetween($check, $excStr, $onLineStr));
             } else if (strpos($lower, '__string_template__')) {
                 throw new Exception('Error parsing template, found __string_template__');
