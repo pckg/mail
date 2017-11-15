@@ -1,11 +1,11 @@
 <?php namespace Pckg\Mail\Service;
 
 use Derive\Layout\Command\GetLessVariables;
-use Pckg\Mail\Service\Mail\Adapter\Admin;
-use Pckg\Mail\Service\Mail\Adapter\Site;
-use Gnp\Mail\Entity\Mails;
 use Pckg\Framework\Exception\NotFound;
 use Pckg\Framework\View\Twig;
+use Pckg\Mail\Entity\Mails;
+use Pckg\Mail\Service\Mail\Adapter\Admin;
+use Pckg\Mail\Service\Mail\Adapter\Site;
 use Pckg\Mail\Service\Mail\Attachment;
 use Swift_Mailer;
 use Swift_MailTransport;

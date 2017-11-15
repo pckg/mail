@@ -8,9 +8,10 @@ use Derive\Orders\Entity\OrdersUsers;
 use Derive\Orders\Entity\Users;
 use Derive\User\Service\Mail\User;
 use Exception;
-use Gnp\Mail\Record\Mail as MailRecord;
 use Pckg\Collection;
 use Pckg\Framework\Helper\Traits;
+use Pckg\Mail\Record\Mail as MailDbRecord;
+use Pckg\Mail\Record\Mail as MailRecord;
 use Pckg\Mail\Service\Mail\Adapter\SimpleUser;
 use Pckg\Queue\Record\Queue;
 
@@ -21,6 +22,16 @@ class Mail
 
     public function getPrepareAction()
     {
+    }
+
+    public function postCreateAction()
+    {
+        $data = post('mail');
+        unset($data['id']);
+
+        return [
+            'mail' => MailDbRecord::create($data),
+        ];
     }
 
     /**
