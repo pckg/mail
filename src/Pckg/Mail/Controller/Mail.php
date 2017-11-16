@@ -108,7 +108,9 @@ class Mail
                     $inquiry = (new Inquiries())->where('id', $recipient)->one();
                     $receiver = new SimpleUser($inquiry->email, $inquiry->name, $inquiry->surname);
                     $data['fetch']['inquiry'][Inquiries::class] = $inquiry->id;
-                    $data['trigger'][Inquiry::class . '.responded'] = 'inquiry';
+                    if ($test) {
+                        $data['trigger'][Inquiry::class . '.responded'] = 'inquiry';
+                    }
                 } else {
                     throw new Exception("Unknown recipient type");
                 }
