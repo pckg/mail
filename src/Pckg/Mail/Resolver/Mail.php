@@ -1,19 +1,14 @@
 <?php namespace Pckg\Mail\Resolver;
 
+use Pckg\Framework\Provider\Helper\EntityResolver;
 use Pckg\Framework\Provider\RouteResolver;
 use Pckg\Mail\Entity\Mails;
 
 class Mail implements RouteResolver
 {
 
-    public function resolve($value)
-    {
-        return (new Mails())->where('id', $value)->oneOrFail();
-    }
+    use EntityResolver;
 
-    public function parametrize($record)
-    {
-        return $record->id;
-    }
+    protected $entity = Mails::class;
 
 }

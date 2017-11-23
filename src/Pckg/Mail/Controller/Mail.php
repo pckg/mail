@@ -34,6 +34,13 @@ class Mail
         ];
     }
 
+    public function postMailAction(MailDbRecord $mail)
+    {
+        $mail->setAndSave(post()->all());
+
+        return $this->response()->respondWithSuccess();
+    }
+
     /**
      * We will send email to:
      *  - order(s) (order.user.email, order.user.fullName)
