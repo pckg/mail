@@ -82,7 +82,7 @@ class SendMail extends Command
         /**
          * Skip dummy email.
          */
-        if (is_object($user) && is_string($user->getEmail()) && strpos($user->getEmail(), '@gnp.si')) {
+        if (is_object($user) && is_string($user->getEmail()) && strpos($user->getEmail(), '@') === false) {
             $this->output('Skipping ' . $user->getEmail());
 
             return;
