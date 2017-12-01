@@ -36,7 +36,7 @@ class Mail
 
     public function postMailAction(MailDbRecord $mail)
     {
-        $mail->setAndSave(post()->all());
+        $mail->setAndSave(post('mail'));
 
         return $this->response()->respondWithSuccess();
     }
