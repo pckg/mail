@@ -7,6 +7,7 @@ use Pckg\Mail\Entity\Mails;
 use Pckg\Mail\Service\Mail\Adapter\Admin;
 use Pckg\Mail\Service\Mail\Adapter\Site;
 use Pckg\Mail\Service\Mail\Attachment;
+use Pckg\Mailo\Swift\Transport\MailoTransport;
 use Swift_Mailer;
 use Swift_MailTransport;
 use Swift_Message;
@@ -41,6 +42,8 @@ class Mail
             return new Swift_MailTransport();
         } else if ($transportClass == Swift_NullTransport::class) {
             return new Swift_NullTransport();
+        } else if ($transportClass == MailoTransport::class) {
+            return new MailoTransport();
         }
 
         return new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
