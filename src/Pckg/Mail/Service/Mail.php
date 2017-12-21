@@ -43,7 +43,7 @@ class Mail
         } else if ($transportClass == Swift_NullTransport::class) {
             return new Swift_NullTransport();
         } else if ($transportClass == MailoTransport::class) {
-            return new MailoTransport();
+            return resolve(MailoTransport::class);
         }
 
         return new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
