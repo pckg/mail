@@ -109,6 +109,20 @@ class Mail
         return $this;
     }
 
+    public function returnPath($address)
+    {
+        $this->mail->setReturnPath($address);
+
+        return $this;
+    }
+
+    public function readReceipt($address)
+    {
+        $this->mail->setReadReceiptTo($address);
+
+        return $this;
+    }
+
     public function subject($subject)
     {
         $this->mail->setSubject($subject);
@@ -201,9 +215,9 @@ class Mail
         return $this;
     }
 
-    public function send()
+    public function send(&$failedRecipients = null)
     {
-        return $this->mailer->send($this->mail);
+        return $this->mailer->send($this->mail, $failedRecipients);
     }
 
     public function mail()
