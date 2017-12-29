@@ -184,6 +184,7 @@ class SendMail extends Command
         /**
          * Save log.
          */
+        $eventData['transport'] = $mailService->transport();
         trigger(SendMail::class . '.mailSent', $eventData);
 
         $triggers = $data['trigger'] ?? [];

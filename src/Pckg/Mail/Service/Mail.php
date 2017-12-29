@@ -225,4 +225,9 @@ class Mail
         return $this->mail;
     }
 
+    public function transport()
+    {
+        return $this->mailer->getTransport();
+    }
+
 }
