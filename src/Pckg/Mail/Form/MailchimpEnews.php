@@ -25,11 +25,11 @@ class MailchimpEnews extends Form implements ResolvesOnRequest
     {
         $this->addFieldset('fields');
         $this->addEmail('email')
-             ->setPlaceholder(__('placeholder_email'))
+             ->setPlaceholder(__('pckg.mail.email'))
              ->setAttribute('data-validation-engine', 'validate[required,custom[email]]');
 
         $this->addSubmit('submit')
-             ->setValue(__('btn_mailchimp_send'))
+             ->setValue(__('pckg.mail.mailchimp.send'))
              ->setBig();
 
         return $this;
