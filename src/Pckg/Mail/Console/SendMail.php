@@ -6,6 +6,7 @@ use Pckg\Auth\Entity\Users;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
 use Pckg\Mail\Service\Mail\Adapter\User;
+use Pckg\Mailo\Swift\Transport\MailoTransport;
 use Symfony\Component\Console\Input\InputOption;
 
 class SendMail extends Command
@@ -139,6 +140,7 @@ class SendMail extends Command
             'mailService' => $mailService,
             'template'    => $template,
             'mailsSent'   => $mailsSent,
+            'transport'   => $mailService->transport(),
         ]);
         if (isset($data['attach'])) {
             trigger(SendMail::class . '.processAttachments', $eventData);
@@ -169,6 +171,14 @@ class SendMail extends Command
         trigger(SendMail::class . '.sendingMail', $eventData);
 
         /**
+         * Set mail type, if it exists in transport.
+         */
+        $transport = $mailService->transport();
+        if (method_exists($transport, 'setMailType')) {
+            $transport->setMailType($realData['type'] ?? MailoTransport::TYPE_TRANSACTIONAL);
+        }
+
+        /**
          * Send email.
          */
         if ($dump) {
@@ -184,7 +194,6 @@ class SendMail extends Command
         /**
          * Save log.
          */
-        $eventData['transport'] = $mailService->transport();
         trigger(SendMail::class . '.mailSent', $eventData);
 
         $triggers = $data['trigger'] ?? [];
