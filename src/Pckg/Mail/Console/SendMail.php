@@ -176,7 +176,6 @@ class SendMail extends Command
         /**
          * Send email.
          */
-        dd('yes');
         if ($dump) {
             $path = path('tmp') . 'maildump_' . date('YmdHis') . '_' . sha1(microtime()) . '.html';
             file_put_contents($path, $mailService->mail()->getBody());
