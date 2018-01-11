@@ -21,13 +21,9 @@ class SendMail extends Command
                      'template' => 'Template slug',
                      'user'     => 'User id',
                      'data'     => 'Template data',
-                 ],
-                 InputOption::VALUE_REQUIRED
-             )
-             ->addOptions([
-                              'content' => 'Mail content',
-                              'subject' => 'Mail subject',
-                          ], InputOption::VALUE_REQUIRED)
+                     'content'  => 'Mail content',
+                     'subject'  => 'Mail subject',
+                 ], InputOption::VALUE_REQUIRED)
              ->addOptions(
                  [
                      'template-required' => '',
@@ -116,12 +112,11 @@ class SendMail extends Command
             );
         }
 
-        if (!$template || (isset($data['subject']) && isset($data['content']))) {
-            $mailService->subjectAndContent(
-                $data['subject'] ?? '',
-                $data['content'] ?? '',
-                $realData
-            );
+        /**
+         * Subject and content were manually set.
+         */
+        if ($subject = $this->option('subject') && $content = $this->option('content')) {
+            $mailService->subjectAndContent($subject, $content, $realData);
         }
 
         /**
@@ -181,6 +176,7 @@ class SendMail extends Command
         /**
          * Send email.
          */
+        dd('yes');
         if ($dump) {
             $path = path('tmp') . 'maildump_' . date('YmdHis') . '_' . sha1(microtime()) . '.html';
             file_put_contents($path, $mailService->mail()->getBody());

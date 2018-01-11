@@ -145,10 +145,15 @@ class Mail
                 /**
                  * Handle custom newsletter.
                  */
+                $finalTemplate = null;
                 if ($type == 'newsletter') {
                     $content = post('mail');
-                    $data['data']['content'] = $content['content'];
-                    $data['data']['subject'] = $content['subject'];
+                    $finalTemplate = [
+                        'content' => $content['content'],
+                        'subject' => $content['subject'],
+                    ];
+                } else {
+                    $finalTemplate = $template['identifier'];
                 }
 
                 /**
@@ -159,7 +164,7 @@ class Mail
                 /**
                  * Put non-campaign mails to queue after document generation.
                  */
-                $queue = email($template['identifier'], $receiver, $data);
+                $queue = email($finalTemplate, $receiver, $data);
                 if ($queue instanceof Queue) {
                     $queue->makeTimeoutAfterLast('mail:send', '+2seconds');
                 }

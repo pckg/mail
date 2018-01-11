@@ -15,8 +15,8 @@ class Queue implements HandlerInterface
         if (is_string($template)) {
             $params['template'] = $template;
         } else {
-            $params['data']['subject'] = $template['subject'];
-            $params['data']['content'] = $template['content'];
+            $params['subject'] = $template['subject'];
+            $params['content'] = $template['content'];
         }
 
         return queue()->create('mail:send', $params);
