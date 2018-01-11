@@ -115,7 +115,7 @@ class SendMail extends Command
         /**
          * Subject and content were manually set.
          */
-        if ($subject = $this->option('subject') && $content = $this->option('content')) {
+        if (($subject = $this->option('subject')) && ($content = $this->option('content'))) {
             $mailService->subjectAndContent($subject, $content, $realData);
         }
 
