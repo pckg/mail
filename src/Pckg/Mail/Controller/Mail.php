@@ -146,8 +146,8 @@ class Mail
                  * Handle custom newsletter.
                  */
                 $finalTemplate = null;
-                if ($type == 'newsletter') {
-                    $content = post('mail');
+                $content = post('mail');
+                if (isset($content['content']) && isset($content['subject'])) {
                     $finalTemplate = [
                         'content' => $content['content'],
                         'subject' => $content['subject'],
