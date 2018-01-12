@@ -23,6 +23,8 @@ class SendMail extends Command
                      'data'     => 'Template data',
                      'content'  => 'Mail content',
                      'subject'  => 'Mail subject',
+                     'campaign' => 'Campaign',
+                     'queue'    => 'Queue',
                  ], InputOption::VALUE_REQUIRED)
              ->addOptions(
                  [
@@ -40,6 +42,8 @@ class SendMail extends Command
     public function handle(Mail $mailService)
     {
         $template = $this->option('template');
+        $campaign = $this->option('campaign');
+        $queue = $this->option('queue');
         $user = $this->option('user');
         $dump = $this->option('dump');
         $data = $this->option('data');
@@ -171,6 +175,20 @@ class SendMail extends Command
         $transport = $mailService->transport();
         if (method_exists($transport, 'setMailType')) {
             $transport->setMailType($realData['type'] ?? MailoTransport::TYPE_TRANSACTIONAL);
+        }
+
+        /**
+         * Set mail type, if it exists in transport.
+         */
+        if ($campaign && method_exists($transport, 'setCampaign')) {
+            $transport->setCampaign($campaign);
+        }
+
+        /**
+         * Set mail type, if it exists in transport.
+         */
+        if ($queue && method_exists($transport, 'setQueue')) {
+            $transport->setQueue($queue);
         }
 
         /**
