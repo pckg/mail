@@ -174,7 +174,9 @@ class SendMail extends Command
          */
         $transport = $mailService->transport();
         if (method_exists($transport, 'setMailType')) {
-            $transport->setMailType($realData['type'] ?? MailoTransport::TYPE_TRANSACTIONAL);
+            $transport->setMailType($realData['type'] == 'newsletter'
+                                        ? MailoTransport::TYPE_PROMO
+                                        : MailoTransport::TYPE_TRANSACTIONAL);
         }
 
         /**

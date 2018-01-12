@@ -182,6 +182,7 @@ class Mail
                 [
                     'subject' => $subject,
                     'content' => $content,
+                    'type'    => $data['type'] ?? 'transactional',
                     'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
                 ]
             )

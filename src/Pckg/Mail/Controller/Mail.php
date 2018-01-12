@@ -65,7 +65,7 @@ class Mail
         $attachments = new Collection($this->post('attachments', []));
         $template = $this->post('mail');
         $receiverType = $this->post('receiverType');
-        $type = $this->post('type');
+        $type = $this->post('type'); // newsletter, inquiry, ...
 
         /**
          * Send only 1 mail in test mode.
@@ -146,11 +146,11 @@ class Mail
                  * Handle custom newsletter.
                  */
                 $finalTemplate = null;
-                $content = post('mail');
-                if (isset($content['content']) && isset($content['subject'])) {
+                $mail = post('mail');
+                if (isset($mail['content']) && isset($mail['subject'])) {
                     $finalTemplate = [
-                        'content' => $content['content'],
-                        'subject' => $content['subject'],
+                        'content' => $mail['content'],
+                        'subject' => $mail['subject'],
                     ];
                 } else {
                     $finalTemplate = $template['identifier'];
@@ -160,6 +160,11 @@ class Mail
                  * Handle offers.
                  */
                 $data['data']['afterContent'] = $offersHtml;
+
+                /**
+                 * Handle type.
+                 */
+                $data['data']['type'] = $mail['type'];
 
                 /**
                  * Put non-campaign mails to queue after document generation.
