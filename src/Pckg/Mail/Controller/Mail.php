@@ -123,10 +123,17 @@ class Mail
                 }
 
                 /**
-                 * Test mail is always sent to current logged-in user.
+                 * Test receivers
                  */
+                $receivers = [];
                 if ($test) {
-                    $receiver = new User($this->auth()->getUser());
+                    $testEmails = explode(' ', str_replace([',', '  '], ' ', post('testRecipients')));
+                    $auth = $this->auth();
+                    foreach ($testEmails as $testEmail) {
+                        $receivers[] = new SimpleUser($testEmail, $auth->user('name'), $auth->user('surname'));
+                    }
+                } else {
+                    $receivers[] = $receiver;
                 }
 
                 if (!$receiver) {
@@ -169,9 +176,11 @@ class Mail
                 /**
                  * Put non-campaign mails to queue after document generation.
                  */
-                $queue = email($finalTemplate, $receiver, $data);
-                if ($queue instanceof Queue) {
-                    $queue->makeTimeoutAfterLast('mail:send', '+2seconds');
+                foreach ($receivers as $r) {
+                    $queue = email($finalTemplate, $r, $data);
+                    if ($queue instanceof Queue) {
+                        $queue->makeTimeoutAfterLast('mail:send', '+2seconds');
+                    }
                 }
             }
         );
