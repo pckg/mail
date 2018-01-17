@@ -171,7 +171,7 @@ class Mail
                 /**
                  * Handle type.
                  */
-                $data['data']['type'] = $mail['type'];
+                $data['data']['type'] = $type == 'newsletter' ? 'newsletter' : 'transactional';
 
                 /**
                  * Put non-campaign mails to queue after document generation.
