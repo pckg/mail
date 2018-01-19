@@ -35,6 +35,11 @@ class Mail
     public function __construct()
     {
         $this->mailer = new Swift_Mailer($this->getTransport());
+        $this->reset();
+    }
+
+    public function reset()
+    {
         $this->mail = $this->mailer->createMessage();
     }
 
@@ -301,7 +306,11 @@ class Mail
 
     public function send(&$failedRecipients = null)
     {
-        return $this->mailer->send($this->mail, $failedRecipients);
+        $send = $this->mailer->send($this->mail, $failedRecipients);
+
+        $this->reset();
+
+        return $send;
     }
 
     public function mail()
