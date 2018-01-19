@@ -1,11 +1,15 @@
 <?php namespace Pckg\Mail\Service;
 
 use Derive\Layout\Command\GetLessVariables;
+use Exception;
+use Pckg\Auth\Entity\Users;
 use Pckg\Framework\Exception\NotFound;
 use Pckg\Framework\View\Twig;
 use Pckg\Mail\Entity\Mails;
 use Pckg\Mail\Service\Mail\Adapter\Admin;
+use Pckg\Mail\Service\Mail\Adapter\Recipient;
 use Pckg\Mail\Service\Mail\Adapter\Site;
+use Pckg\Mail\Service\Mail\Adapter\User;
 use Pckg\Mail\Service\Mail\Attachment;
 use Pckg\Mailo\Swift\Transport\MailoTransport;
 use Swift_Mailer;
@@ -47,6 +51,85 @@ class Mail
         }
 
         return new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
+    }
+
+    public function readDataFetch($data, $realData)
+    {
+        /**
+         * Fetch required data.
+         */
+        if (isset($data['fetch'])) {
+            foreach ($data['fetch'] as $key => $config) {
+                foreach ($config as $entity => $id) {
+                    $realData[$key] = (new $entity)->where('id', $id)->oneOrFail();
+                    break;
+                }
+            }
+        }
+
+        return $realData;
+    }
+
+    public function exceptionOnError()
+    {
+        $checks = [$this->mail()->getBody(), $this->mail()->getSubject()];
+        $excStr = 'an exception has been thrown during the rendering of a template';
+        $onLineStr = 'at line';
+        foreach ($checks as $check) {
+            $lower = strtolower($check);
+            if (!$lower) {
+                throw new Exception('Empty subject or content');
+            } else if (strpos($lower, $excStr)) {
+                throw new Exception('Error parsing template, exception: ' . strbetween($check, $excStr, $onLineStr));
+            } else if (strpos($lower, '__string_template__')) {
+                throw new Exception('Error parsing template, found __string_template__');
+            } else if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
+                throw new Exception('Error parsing template, found php error');
+            }
+        }
+    }
+
+    public function checkTemplate($template, Recipient $user, $data)
+    {
+        /**
+         * Create mail template, body, subject.
+         */
+        if ($template) {
+            $locale = $user->getLocale();
+            if (isset($realData['order'])) {
+                $locale = $realData['order']->getLocale();
+            }
+            runInLocale(
+                function() use ($template, $realData, $data) {
+                    $this->template($template, $realData, $data);
+                },
+                $locale
+            );
+        }
+    }
+
+    public function prepareUser($user)
+    {
+        if (is_numeric($user)) {
+            /**
+             * Receive user from database.
+             */
+            return new User((new Users())->where('id', $user)->oneOrFail());
+        }
+
+        if (!is_object($user)) {
+            /**
+             * Object was passed.
+             */
+            return unserialize(base64_decode($user));
+        }
+
+        return $user;
+    }
+
+    public function isDummy($user)
+    {
+        return is_object($user) && is_string($user->getEmail()) && strpos($user->getEmail(), '@') === false;
     }
 
     public function from($email, $name = null)

@@ -2,7 +2,7 @@
 
 use Pckg\Auth\Record\User as UserRecord;
 
-class User implements Recipient
+class User extends AbstractAdapter implements Recipient
 {
 
     protected $user;

@@ -2,15 +2,18 @@
 
 use Exception;
 use Gnp\Mail\Record\MailsSent;
-use Pckg\Auth\Entity\Users;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
-use Pckg\Mail\Service\Mail\Adapter\User;
 use Pckg\Mailo\Swift\Transport\MailoTransport;
 use Symfony\Component\Console\Input\InputOption;
+use Throwable;
 
 class SendMail extends Command
 {
+
+    protected $realData = [];
+
+    protected $eventData = [];
 
     protected function configure()
     {
@@ -39,14 +42,8 @@ class SendMail extends Command
              );
     }
 
-    public function handle(Mail $mailService)
+    public function emulate(Mail $mailService, $template, $campaign, $queue, $user, $data, $dump, $subject, $content)
     {
-        $template = $this->option('template');
-        $campaign = $this->option('campaign');
-        $queue = $this->option('queue');
-        $user = $this->option('user');
-        $dump = $this->option('dump');
-        $data = $this->option('data');
         if (!is_array($data)) {
             $data = (array)json_decode($data, true);
         }
@@ -56,38 +53,19 @@ class SendMail extends Command
             $realData = $data['data'];
         }
 
-        /**
-         * Fetch required data.
-         */
-        if (isset($data['fetch'])) {
-            foreach ($data['fetch'] as $key => $config) {
-                foreach ($config as $entity => $id) {
-                    $realData[$key] = (new $entity)->where('id', $id)->oneOrFail();
-                    break;
-                }
-            }
-        }
+        $realData = $mailService->readDataFetch($data, $realData);
 
-        if (is_numeric($user)) {
-            /**
-             * Receive user from database.
-             */
-            $user = new User((new Users())->where('id', $user)->oneOrFail());
-        } elseif (!is_object($user)) {
-            /**
-             * Object was passed.
-             */
-            $user = unserialize(base64_decode($user));
-        }
+        $user = $mailService->prepareUser($user);
 
         /**
          * Skip dummy email.
          */
-        if (is_object($user) && is_string($user->getEmail()) && strpos($user->getEmail(), '@') === false) {
+        if ($mailService->isDummy($user)) {
             $this->output('Skipping ' . $user->getEmail());
 
             return;
         }
+
         /**
          * Create recipient.
          */
@@ -100,26 +78,12 @@ class SendMail extends Command
             throw new Exception("Recipient not set");
         }
 
-        /**
-         * Create mail template, body, subject.
-         */
-        if ($template) {
-            $locale = $user->getLocale();
-            if (isset($realData['order'])) {
-                $locale = $realData['order']->getLocale();
-            }
-            runInLocale(
-                function() use ($template, $mailService, $realData, $data) {
-                    $mailService->template($template, $realData, $data);
-                },
-                $locale
-            );
-        }
+        $mailService->checkTemplate($template, $user, $data);
 
         /**
          * Subject and content were manually set.
          */
-        if (($subject = $this->option('subject')) && ($content = $this->option('content'))) {
+        if ($subject && $content) {
             $mailService->subjectAndContent($subject, $content, $realData);
         }
 
@@ -148,20 +112,10 @@ class SendMail extends Command
         /**
          * Check for errors.
          */
-        $checks = [$mailService->mail()->getBody(), $mailService->mail()->getSubject()];
-        $excStr = 'an exception has been thrown during the rendering of a template';
-        $onLineStr = 'at line';
-        foreach ($checks as $check) {
-            $lower = strtolower($check);
-            if (!$lower) {
-                throw new Exception('Empty subject or content');
-            } else if (strpos($lower, $excStr)) {
-                throw new Exception('Error parsing template, exception: ' . strbetween($check, $excStr, $onLineStr));
-            } else if (strpos($lower, '__string_template__')) {
-                throw new Exception('Error parsing template, found __string_template__');
-            } else if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
-                throw new Exception('Error parsing template, found php error');
-            }
+        try {
+            $mailService->exceptionOnError();
+        } catch (Throwable $e) {
+            throw $e;
         }
 
         /**
@@ -193,6 +147,23 @@ class SendMail extends Command
             $transport->setQueue($queue);
         }
 
+        $this->realData = $realData;
+        $this->eventData = $eventData;
+    }
+
+    public function handle(Mail $mailService)
+    {
+        $template = $this->option('template');
+        $campaign = $this->option('campaign');
+        $queue = $this->option('queue');
+        $user = $this->option('user');
+        $dump = $this->option('dump');
+        $data = $this->option('data');
+        $subject = $this->option('subject');
+        $content = $this->option('content');
+
+        $this->emulate($mailService, $template, $campaign, $queue, $user, $data, $dump, $subject, $content);
+
         /**
          * Send email.
          */
@@ -209,16 +180,16 @@ class SendMail extends Command
         /**
          * Save log.
          */
-        trigger(SendMail::class . '.mailSent', $eventData);
+        trigger(SendMail::class . '.mailSent', $this->eventData);
 
         $triggers = $data['trigger'] ?? [];
         foreach ($triggers as $event => $load) {
-            trigger($event, $realData[$load]);
+            trigger($event, $this->realData[$load]);
         }
 
         $this->output('Mail sent!');
 
-        return $eventData;
+        return $this->eventData;
     }
 
 }
