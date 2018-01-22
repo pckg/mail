@@ -78,7 +78,7 @@ class SendMail extends Command
             throw new Exception("Recipient not set");
         }
 
-        $mailService->checkTemplate($template, $user, $data);
+        $mailService->checkTemplate($template, $user, $data, $realData);
 
         /**
          * Subject and content were manually set.

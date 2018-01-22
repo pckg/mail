@@ -94,7 +94,7 @@ class Mail
         }
     }
 
-    public function checkTemplate($template, Recipient $user, $data)
+    public function checkTemplate($template, Recipient $user, $data, $realData)
     {
         /**
          * Create mail template, body, subject.
