@@ -149,6 +149,8 @@ class SendMail extends Command
 
         $this->realData = $realData;
         $this->eventData = $eventData;
+
+        return $eventData;
     }
 
     public function handle(Mail $mailService)
