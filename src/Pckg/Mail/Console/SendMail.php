@@ -44,9 +44,6 @@ class SendMail extends Command
 
     public function emulate(Mail $mailService, $template, $campaign, $queue, $user, $data, $dump, $subject, $content)
     {
-        if (!is_array($data)) {
-            $data = (array)json_decode($data, true);
-        }
         $realData = [];
 
         if (!empty($data['data'])) {
@@ -163,6 +160,10 @@ class SendMail extends Command
         $data = $this->option('data');
         $subject = $this->option('subject');
         $content = $this->option('content');
+        
+        if (!is_array($data)) {
+            $data = (array)json_decode($data, true);
+        }
 
         $this->emulate($mailService, $template, $campaign, $queue, $user, $data, $dump, $subject, $content);
 
