@@ -77,19 +77,21 @@ class Mail
 
     public function exceptionOnError()
     {
-        $checks = [$this->mail()->getBody(), $this->mail()->getSubject()];
+        $checks = ['body' => $this->mail()->getBody(), 'subject' => $this->mail()->getSubject()];
         $excStr = 'an exception has been thrown during the rendering of a template';
         $onLineStr = 'at line';
-        foreach ($checks as $check) {
+
+        foreach ($checks as $key => $check) {
             $lower = strtolower($check);
             if (!$lower) {
-                throw new Exception('Empty subject or content');
+                throw new Exception('Empty ' . $key);
             } else if (strpos($lower, $excStr)) {
-                throw new Exception('Error parsing template, exception: ' . strbetween($check, $excStr, $onLineStr));
+                throw new Exception('Error parsing ' . $key . ' template, exception: ' .
+                                    strbetween($check, $excStr, $onLineStr));
             } else if (strpos($lower, '__string_template__')) {
-                throw new Exception('Error parsing template, found __string_template__');
+                throw new Exception('Error parsing ' . $key . ' template, found __string_template__');
             } else if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
-                throw new Exception('Error parsing template, found php error');
+                throw new Exception('Error parsing ' . $key . ' template, found php error');
             }
         }
     }

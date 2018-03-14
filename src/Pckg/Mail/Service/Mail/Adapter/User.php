@@ -24,6 +24,7 @@ class User extends AbstractAdapter implements Recipient
 
     public function getLocale()
     {
+        // @T00D00
         return $this->user->language_id == 'sl' ? 'sl_SI' : ($this->user->language_id == 'hr' ? 'hr_HR' : 'en_GB');
     }
 
