@@ -49,11 +49,26 @@ class Mail
 
         if ($transportClass == Swift_MailTransport::class) {
             return new Swift_MailTransport();
-        } else if ($transportClass == Swift_NullTransport::class) {
+        }
+
+        if ($transportClass == Swift_NullTransport::class) {
             return new Swift_NullTransport();
-        } else if ($transportClass == MailoTransport::class) {
+        }
+
+        if ($transportClass == \Swift_SmtpTransport::class) {
+            $config = config('pckg.mail.auth.' . \Swift_SmtpTransport::class, []);
+
+            $transport = new \Swift_SmtpTransport($config['host'], $config['port'], $config['security']);
+            $transport->setUsername($config['username']);
+            $transport->setPassword($config['password']);
+
+            return $transport;
+        }
+
+        if ($transportClass == MailoTransport::class) {
             return resolve(MailoTransport::class);
         }
+
 
         return new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
     }
@@ -85,12 +100,19 @@ class Mail
             $lower = strtolower($check);
             if (!$lower) {
                 throw new Exception('Empty ' . $key);
-            } else if (strpos($lower, $excStr)) {
-                throw new Exception('Error parsing ' . $key . ' template, exception: ' .
-                                    strbetween($check, $excStr, $onLineStr));
-            } else if (strpos($lower, '__string_template__')) {
+            }
+
+            if (strpos($lower, $excStr)) {
+                throw new Exception(
+                    'Error parsing ' . $key . ' template, exception: ' . strbetween($check, $excStr, $onLineStr)
+                );
+            }
+
+            if (strpos($lower, '__string_template__')) {
                 throw new Exception('Error parsing ' . $key . ' template, found __string_template__');
-            } else if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
+            }
+
+            if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
                 throw new Exception('Error parsing ' . $key . ' template, found php error');
             }
         }
@@ -109,8 +131,7 @@ class Mail
             runInLocale(
                 function() use ($template, $realData, $data) {
                     $this->template($template, $realData, $data);
-                },
-                $locale
+                }, $locale
             );
         }
     }
@@ -191,8 +212,7 @@ class Mail
 
         foreach ($emails as $key => $value) {
             $this->mail->addTo(
-                is_int($key) ? $value : $key,
-                is_int($key) && $name ? $name : $value
+                is_int($key) ? $value : $key, is_int($key) && $name ? $name : $value
             );
         }
 
@@ -229,27 +249,26 @@ class Mail
 
     public function template($template, $data = [], $fulldata = [])
     {
-        $email = (new Mails())->where('identifier', $template)
-                              ->joinFallbackTranslation()
-                              ->oneOrFail(
-                                  function() use ($template) {
-                                      throw new NotFound('Template ' . $template . ' not found');
-                                  }
-                              );
+        $email = (new Mails())->where('identifier', $template)->joinFallbackTranslation()->oneOrFail(
+            function() use ($template) {
+                throw new NotFound('Template ' . $template . ' not found');
+            }
+        );
 
         $subject = (new Twig(null, $data))->setTemplate($fulldata['data']['subject'] ?? $email->subject)->autoparse();
         $content = (new Twig(null, $data))->setTemplate($fulldata['data']['content'] ?? $email->content)->autoparse();
 
-        $data = array_merge($data, [
-            'subject' => $subject,
-            'content' => $content,
-            'type'    => $email->type,
-            'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
-        ]);
+        $data = array_merge(
+            $data, [
+                     'subject' => $subject,
+                     'content' => $content,
+                     'type'    => $email->type,
+                     'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
+                 ]
+        );
         $body = view('Pckg/Mail:layout', $data)->autoparse();
 
-        $this->body($body)
-             ->subject($subject);
+        $this->body($body)->subject($subject);
 
         $this->fromSite();
 
@@ -266,20 +285,18 @@ class Mail
         $content = (new Twig(null, $data))->setTemplate($content)->autoparse();
 
         $body = view(
-            'Pckg/Mail:layout',
-            array_merge(
-                $data,
-                [
-                    'subject' => $subject,
-                    'content' => $content,
-                    'type'    => $data['type'] ?? 'transactional',
-                    'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
-                ]
-            )
+            'Pckg/Mail:layout', array_merge(
+                                  $data, [
+                                           'subject' => $subject,
+                                           'content' => $content,
+                                           'type'    => $data['type'] ?? 'transactional',
+                                           'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables(
+                                           ))->execute() : [],
+                                       ]
+                              )
         )->autoparse();
 
-        $this->body($body)
-             ->subject($subject);
+        $this->body($body)->subject($subject);
 
         $this->fromSite();
 
