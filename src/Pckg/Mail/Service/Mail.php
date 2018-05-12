@@ -101,14 +101,19 @@ class Mail
             $lower = strtolower($check);
             if (!$lower) {
                 throw new Exception('Empty ' . $key);
-            } elseif (strpos($lower, $excStr)) {
+            }
+
+            if (strpos($lower, $excStr)) {
                 throw new Exception(
-                    'Error parsing ' . $key . ' template, exception: ' .
-                    strbetween($check, $excStr, $onLineStr)
+                    'Error parsing ' . $key . ' template, exception: ' . strbetween($check, $excStr, $onLineStr)
                 );
-            } elseif (strpos($lower, '__string_template__')) {
+            }
+
+            if (strpos($lower, '__string_template__')) {
                 throw new Exception('Error parsing ' . $key . ' template, found __string_template__');
-            } elseif (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
+            }
+
+            if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
                 throw new Exception('Error parsing ' . $key . ' template, found php error');
             }
         }
@@ -127,8 +132,7 @@ class Mail
             runInLocale(
                 function() use ($template, $realData, $data) {
                     $this->template($template, $realData, $data);
-                },
-                $locale
+                }, $locale
             );
         }
     }
@@ -209,8 +213,7 @@ class Mail
 
         foreach ($emails as $key => $value) {
             $this->mail->addTo(
-                is_int($key) ? $value : $key,
-                is_int($key) && $name ? $name : $value
+                is_int($key) ? $value : $key, is_int($key) && $name ? $name : $value
             );
         }
 
@@ -247,13 +250,11 @@ class Mail
 
     public function template($template, $data = [], $fulldata = [])
     {
-        $email = (new Mails())->where('identifier', $template)
-                              ->joinFallbackTranslation()
-                              ->oneOrFail(
-                                  function() use ($template) {
-                                      throw new NotFound('Template ' . $template . ' not found');
-                                  }
-                              );
+        $email = (new Mails())->where('identifier', $template)->joinFallbackTranslation()->oneOrFail(
+            function() use ($template) {
+                throw new NotFound('Template ' . $template . ' not found');
+            }
+        );
 
         $subject = (new Twig(null, $data))->setTemplate($fulldata['data']['subject'] ?? $email->subject)->autoparse();
         $content = (new Twig(null, $data))->setTemplate($fulldata['data']['content'] ?? $email->content)->autoparse();
@@ -268,8 +269,7 @@ class Mail
         );
         $body = view('Pckg/Mail:layout', $data)->autoparse();
 
-        $this->body($body)
-             ->subject($subject);
+        $this->body($body)->subject($subject);
 
         $this->fromSite();
 
@@ -286,20 +286,18 @@ class Mail
         $content = (new Twig(null, $data))->setTemplate($content)->autoparse();
 
         $body = view(
-            'Pckg/Mail:layout',
-            array_merge(
-                $data,
-                [
-                    'subject' => $subject,
-                    'content' => $content,
-                    'type'    => $data['type'] ?? 'transactional',
-                    'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
-                ]
-            )
+            'Pckg/Mail:layout', array_merge(
+                                  $data, [
+                                           'subject' => $subject,
+                                           'content' => $content,
+                                           'type'    => $data['type'] ?? 'transactional',
+                                           'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables(
+                                           ))->execute() : [],
+                                       ]
+                              )
         )->autoparse();
 
-        $this->body($body)
-             ->subject($subject);
+        $this->body($body)->subject($subject);
 
         $this->fromSite();
 

@@ -191,7 +191,9 @@ class Mail
     public function getTemplateAction(MailRecord $mail)
     {
         return [
-            'mail' => $mail,
+            'mail' => runInLocale(function() use ($mail) {
+                return \Pckg\Mail\Record\Mail::gets(['id' => $mail->id]);
+            }, $_SESSION['pckg_dynamic_lang_id']),
         ];
     }
 
