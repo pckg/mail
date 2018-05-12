@@ -24,7 +24,6 @@ class Command implements HandlerInterface
             $params['--subject'] = $template['subject'];
             $params['--content'] = $template['content'];
         }
-
         (new SendMail())->executeManually($params);
     }
 

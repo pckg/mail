@@ -18,6 +18,7 @@ use Swift_Message;
 use Swift_Mime_SimpleMessage;
 use Swift_NullTransport;
 use Swift_SendmailTransport;
+use Swift_SmtpTransport;
 
 class Mail
 {
@@ -49,10 +50,25 @@ class Mail
 
         if ($transportClass == Swift_MailTransport::class) {
             return new Swift_MailTransport();
-        } else if ($transportClass == Swift_NullTransport::class) {
+        }
+
+        if ($transportClass == Swift_NullTransport::class) {
             return new Swift_NullTransport();
-        } else if ($transportClass == MailoTransport::class) {
+        }
+
+        if ($transportClass == MailoTransport::class) {
             return resolve(MailoTransport::class);
+        }
+
+        if ($transportClass == Swift_SmtpTransport::class) {
+            $config = config('pckg.mail.auth.' . Swift_SmtpTransport::class);
+
+            $transport = new Swift_SmtpTransport($config['host'], $config['port'], $config['security']);
+
+            $transport->setUsername($config['username']);
+            $transport->setPassword($config['password']);
+
+            return $transport;
         }
 
         return new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
@@ -85,12 +101,14 @@ class Mail
             $lower = strtolower($check);
             if (!$lower) {
                 throw new Exception('Empty ' . $key);
-            } else if (strpos($lower, $excStr)) {
-                throw new Exception('Error parsing ' . $key . ' template, exception: ' .
-                                    strbetween($check, $excStr, $onLineStr));
-            } else if (strpos($lower, '__string_template__')) {
+            } elseif (strpos($lower, $excStr)) {
+                throw new Exception(
+                    'Error parsing ' . $key . ' template, exception: ' .
+                    strbetween($check, $excStr, $onLineStr)
+                );
+            } elseif (strpos($lower, '__string_template__')) {
                 throw new Exception('Error parsing ' . $key . ' template, found __string_template__');
-            } else if (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
+            } elseif (strpos($lower, 'must be an instance of') && strpos($lower, 'given, called in')) {
                 throw new Exception('Error parsing ' . $key . ' template, found php error');
             }
         }
@@ -240,12 +258,14 @@ class Mail
         $subject = (new Twig(null, $data))->setTemplate($fulldata['data']['subject'] ?? $email->subject)->autoparse();
         $content = (new Twig(null, $data))->setTemplate($fulldata['data']['content'] ?? $email->content)->autoparse();
 
-        $data = array_merge($data, [
-            'subject' => $subject,
-            'content' => $content,
-            'type'    => $email->type,
-            'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
-        ]);
+        $data = array_merge(
+            $data, [
+                     'subject' => $subject,
+                     'content' => $content,
+                     'type'    => $email->type,
+                     'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
+                 ]
+        );
         $body = view('Pckg/Mail:layout', $data)->autoparse();
 
         $this->body($body)

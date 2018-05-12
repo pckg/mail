@@ -28,7 +28,8 @@ class SendMail extends Command
                      'subject'  => 'Mail subject',
                      'campaign' => 'Campaign',
                      'queue'    => 'Queue',
-                 ], InputOption::VALUE_REQUIRED)
+                 ], InputOption::VALUE_REQUIRED
+             )
              ->addOptions(
                  [
                      'template-required' => '',
@@ -95,13 +96,15 @@ class SendMail extends Command
          * Add attachments.
          */
         $mailsSent = class_exists(MailsSent::class) ? MailsSent::create() : null;
-        $eventData = array_merge($realData, [
+        $eventData = array_merge(
+            $realData, [
             'attachments' => $data['attach'] ?? [],
             'mailService' => $mailService,
             'template'    => $template,
             'mailsSent'   => $mailsSent,
             'transport'   => $mailService->transport(),
-        ]);
+        ]
+        );
         if (isset($data['attach'])) {
             trigger(SendMail::class . '.processAttachments', $eventData);
         }
@@ -125,9 +128,11 @@ class SendMail extends Command
          */
         $transport = $mailService->transport();
         if (isset($realData['type']) && method_exists($transport, 'setMailType')) {
-            $transport->setMailType($realData['type'] == 'newsletter'
-                                        ? MailoTransport::TYPE_NEWSLETTER
-                                        : MailoTransport::TYPE_TRANSACTIONAL);
+            $transport->setMailType(
+                $realData['type'] == 'newsletter'
+                    ? MailoTransport::TYPE_NEWSLETTER
+                    : MailoTransport::TYPE_TRANSACTIONAL
+            );
         }
 
         /**
@@ -160,7 +165,7 @@ class SendMail extends Command
         $data = $this->option('data');
         $subject = $this->option('subject');
         $content = $this->option('content');
-        
+
         if (!is_array($data)) {
             $data = (array)json_decode($data, true);
         }
@@ -174,7 +179,6 @@ class SendMail extends Command
             $path = path('tmp') . 'maildump_' . date('YmdHis') . '_' . sha1(microtime()) . '.html';
             file_put_contents($path, $mailService->mail()->getBody());
             $this->output('Dumped: ' . $path);
-
             return;
         } elseif (!$mailService->send()) {
             throw new Exception('Mail not sent!');
