@@ -102,7 +102,6 @@ class Mail
                     $receiver = new User($orderUser->user);
                     $data['fetch']['orderUser'][OrdersUsers::class] = $orderUser->id;
                     $data['fetch']['order'][Orders::class] = $orderUser->order_id;
-                    $data['fetch']['offer'][Offers::class] = $orderUser->order->offer_id;
                     $data['fetch']['user'][Users::class] = $orderUser->user_id;
                     $order = $orderUser->order;
                 } else if ($receiverType == 'order') {
@@ -110,7 +109,6 @@ class Mail
                     $receiver = new User($order->user);
                     $data['fetch']['order'][Orders::class] = $order->id;
                     $data['fetch']['user'][Users::class] = $order->user_id;
-                    $data['fetch']['offer'][Offers::class] = $order->offer_id;
                 } else if ($receiverType == 'inquiry') {
                     $inquiry = (new Inquiries())->where('id', $recipient)->one();
                     $receiver = new SimpleUser($inquiry->email, $inquiry->name, $inquiry->surname);
