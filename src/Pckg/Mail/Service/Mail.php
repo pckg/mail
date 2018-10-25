@@ -129,6 +129,9 @@ class Mail
             if (isset($realData['order'])) {
                 $locale = $realData['order']->getLocale();
             }
+            if (!$locale && $language = localeManager()->getDefaultFrontendLanguage()) {
+                $locale = $language->locale;
+            }
             runInLocale(
                 function() use ($template, $realData, $data) {
                     $this->template($template, $realData, $data);
