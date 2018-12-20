@@ -2,16 +2,17 @@
 
 use Derive\Newsletter\Controller\Newsletter;
 use Pckg\Generic\Record\Content;
+use Pckg\Generic\Service\Generic\Action;
 use Pckg\Mail\Form\MailchimpEnews;
 
 class Mailchimp
 {
 
-    public function getEnewsAction(MailchimpEnews $mailchimpEnewsForm, Content $content = null)
+    public function getEnewsAction(MailchimpEnews $mailchimpEnewsForm, Action $action)
     {
-        return view('Pckg/Mail:mailchimp/enews', [
+        return view('Pckg/Mail:mailchimp/newsletter', [
             'enewsForm' => $mailchimpEnewsForm,
-            'content'   => $content,
+            'action'   => $action,
         ]);
     }
 
