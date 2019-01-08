@@ -10,6 +10,7 @@ use Derive\User\Service\Mail\User;
 use Exception;
 use Pckg\Collection;
 use Pckg\Framework\Helper\Traits;
+use Pckg\Mail\Entity\Mails;
 use Pckg\Mail\Record\Mail as MailDbRecord;
 use Pckg\Mail\Record\Mail as MailRecord;
 use Pckg\Mail\Service\Mail\Adapter\SimpleUser;
@@ -19,6 +20,13 @@ class Mail
 {
 
     use Traits;
+
+    public function getMailsAction()
+    {
+        $type = get('type') == 'newsletter' ? 'newsletter' : 'frontend';
+        
+        return ['mails' => (new Mails())->where('type', $type)->all()];
+    }
 
     public function getPrepareAction()
     {

@@ -62,6 +62,14 @@ class Mail extends Provider
                                                    'group:admin',
                                                ],
                                            ],
+                                           '/api/mails'     => [
+                                               'controller' => MailController::class,
+                                               'name'       => 'api.mails',
+                                               'view'       => 'mails',
+                                               'tags'       => [
+                                                   'group:admin',
+                                               ],
+                                           ],
                                        ]),
         ];
     }
