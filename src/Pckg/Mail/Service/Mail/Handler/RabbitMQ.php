@@ -31,18 +31,6 @@ class RabbitMQ implements HandlerInterface
          */
         // $rabbit->message('mail:send --template=test --user=schtr4jh@schtr4jh.net --data={...}')
         return queue()->create('mail:send', $params);
-
-        /**
-         * Same way we can handle queue.
-         * Queue is still saved to database for log, with status.
-         * Instead of running tasks with cron we queue them to RabbitMQ.
-         * Mailo example:
-         *  - proxy + multiple web workers + db backend
-         *  - ? cron workers?
-         *  - sendmail workers listening to RabbitMQ channels:
-         *    - mailo:console:mail:send:newsletter
-         *    - mailo:console:mail:send:transactional
-         */
     }
 
 }
