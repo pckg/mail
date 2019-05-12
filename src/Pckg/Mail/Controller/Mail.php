@@ -9,6 +9,7 @@ use Derive\Orders\Entity\Users;
 use Derive\User\Service\Mail\User;
 use Exception;
 use Pckg\Collection;
+use Pckg\Database\Query;
 use Pckg\Framework\Helper\Traits;
 use Pckg\Mail\Entity\Mails;
 use Pckg\Mail\Record\Mail as MailDbRecord;
@@ -74,6 +75,27 @@ class Mail
         $template = $this->post('mail');
         $receiverType = $this->post('receiverType');
         $type = $this->post('type'); // newsletter, inquiry, ...
+
+        /**
+         * If type === offer
+         */
+        if ($receiverType === 'offer') {
+            if ($type === 'upsell') {
+                /**
+                 * Get all orders for offer that have data.
+                 */
+                $recipients = $this->getUpsellOfferRecipients($recipients->all());
+                $type = 'order';
+            } else if ($type === 'remind') {
+                /**
+                 * Get all orders for offer that has missing data.
+                 */
+                $recipients = $this->getRemindOfferRecipients($recipients->all());
+                $type = 'order';
+            } else {
+                throw new Exception('Type is required when sending to offer');
+            }
+        }
 
         /**
          * Send only 1 mail in test mode.
@@ -192,6 +214,24 @@ class Mail
         );
 
         return $this->response()->respondWithSuccess();
+    }
+
+    public function getUpsellOfferRecipients($offers)
+    {
+        return (new Orders())->selectForDataCheck()
+                             ->where('offers.id', $offers)
+                             ->having('hasCompleteData', true)
+                             ->all()
+                             ->map('id');
+    }
+
+    public function getRemindOfferRecipients($offers)
+    {
+        return (new Orders())->selectForDataCheck()
+                             ->where('offers.id', $offers)
+                             ->having('hasCompleteData', true, Query::NOT_LIKE)
+                             ->all()
+                             ->map('id');
     }
 
     public function getTemplateAction(MailRecord $mail)
