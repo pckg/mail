@@ -10,6 +10,7 @@ use Derive\User\Service\Mail\User;
 use Exception;
 use Pckg\Collection;
 use Pckg\Database\Query;
+use Pckg\Database\Relation\HasMany;
 use Pckg\Framework\Helper\Traits;
 use Pckg\Mail\Entity\Mails;
 use Pckg\Mail\Record\Mail as MailDbRecord;
