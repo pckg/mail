@@ -96,15 +96,13 @@ class SendMail extends Command
          * Add attachments.
          */
         $mailsSent = class_exists(MailsSent::class) ? MailsSent::create() : null;
-        $eventData = array_merge(
-            $realData, [
+        $eventData = array_merge($realData, [
             'attachments' => $data['attach'] ?? [],
             'mailService' => $mailService,
             'template'    => $template,
             'mailsSent'   => $mailsSent,
             'transport'   => $mailService->transport(),
-        ]
-        );
+        ]);
         if (isset($data['attach'])) {
             trigger(SendMail::class . '.processAttachments', $eventData);
         }

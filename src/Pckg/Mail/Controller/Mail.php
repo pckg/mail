@@ -85,13 +85,13 @@ class Mail
                  * Get all orders for offer that have data.
                  */
                 $recipients = $this->getUpsellOfferRecipients($recipients->all());
-                $type = 'order';
+                $receiverType = 'order';
             } else if ($type === 'remind') {
                 /**
                  * Get all orders for offer that has missing data.
                  */
                 $recipients = $this->getRemindOfferRecipients($recipients->all());
-                $type = 'order';
+                $receiverType = 'order';
             } else {
                 throw new Exception('Type is required when sending to offer');
             }
@@ -200,6 +200,7 @@ class Mail
                  * Handle type.
                  */
                 $data['data']['type'] = $type == 'newsletter' ? 'newsletter' : 'transactional';
+                $data['data']['realType'] = $type;
 
                 /**
                  * Put non-campaign mails to queue after document generation.
@@ -216,11 +217,24 @@ class Mail
         return $this->response()->respondWithSuccess();
     }
 
+    /**
+     * Return ids for orders with complete data and no upsell.
+     *
+     * @param $offers
+     *
+     * @return \Pckg\Database\Collection
+     */
     public function getUpsellOfferRecipients($offers)
     {
         return (new Orders())->selectForDataCheck()
+                             ->joinUpsellNotificationLogs(function(HasMany $logs) {
+                                 $logs->leftJoin()->groupBy('orders.id');
+                             })
+                             ->addSelect([
+                                             'latestUpsellNotificationDate' => 'MAX(order_logs.created_at)',
+                                         ])
                              ->where('offers.id', $offers)
-                             ->having('hasCompleteData', true)
+                             ->having('hasCompleteData = 1 AND latestUpsellNotificationDate IS NULL', true)
                              ->all()
                              ->map('id');
     }
