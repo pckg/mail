@@ -235,7 +235,7 @@ class Mail
                                              'latestUpsellNotificationDate' => 'MAX(order_logs.created_at)',
                                          ])
                              ->where('offers.id', $offers)
-                             ->having('hasCompleteData = 1 AND latestUpsellNotificationDate IS NULL', true)
+                             ->having('hasCompleteData = 1 AND latestUpsellNotificationDate IS NULL')
                              ->all()
                              ->map('id');
     }
