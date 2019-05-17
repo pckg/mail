@@ -12,7 +12,7 @@ class Admin implements Recipient, MultipleRecipients
 
     public function getEmail()
     {
-        return (new Collection(explode(',', config('site.admin.email'))))->trim()->all();
+        return (new Collection(explode(' ', config('site.admin.email'))))->trim()->all();
     }
 
     public function getLocale()
