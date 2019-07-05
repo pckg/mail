@@ -76,6 +76,7 @@ class Mail
         $template = $this->post('mail');
         $receiverType = $this->post('receiverType');
         $type = $this->post('type'); // newsletter, inquiry, ...
+        $unique = $this->post('uniqueRecipients');
 
         /**
          * If type === offer
@@ -115,9 +116,10 @@ class Mail
             $offersHtml = (new Offers())->where('id', $offers)->all()->map('upsellHtml')->implode();
         }
 
+        $uniqueRecipients = [];
         $recipients->each(
             function($recipient) use (
-                $attachments, $template, $mail, $test, $offersHtml, $receiverType, $type, $recipients
+                $attachments, $template, $mail, $test, $offersHtml, $receiverType, $type, $recipients, &$uniqueRecipients, $unique
             ) {
                 $data = [];
                 /**
@@ -149,6 +151,14 @@ class Mail
                     }
                 } else {
                     throw new Exception("Unknown recipient type");
+                }
+
+                if ($unique) {
+                    if (in_array($receiver->getEmail(), $uniqueRecipients)) {
+                        return;
+                    }
+
+                    $uniqueRecipients[] = $receiver->getEmail();
                 }
 
                 /**
