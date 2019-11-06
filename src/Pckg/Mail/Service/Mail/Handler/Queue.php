@@ -19,6 +19,11 @@ class Queue implements HandlerInterface
             $params['content'] = $template['content'];
         }
 
+        $this->sendParams($params);
+    }
+
+    protected function sendParams(array $params)
+    {
         return queue()->create('mail:send', $params);
     }
 
