@@ -40,6 +40,7 @@ class Mail
         unset($data['id']);
 
         return [
+            'success' => true,
             'mail' => MailDbRecord::create($data),
         ];
     }
