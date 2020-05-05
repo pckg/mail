@@ -129,7 +129,7 @@ class Mail
             if (isset($realData['order'])) {
                 $locale = $realData['order']->getLocale();
             }
-            if (!$locale && $language = localeManager()->getDefaultFrontendLanguage()) {
+            if (/*!$locale && */$language = localeManager()->getDefaultFrontendLanguage()) {
                 $locale = $language->locale;
             }
             runInLocale(
