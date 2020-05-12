@@ -11,6 +11,7 @@ use Pckg\Mail\Service\Mail\Adapter\Recipient;
 use Pckg\Mail\Service\Mail\Adapter\Site;
 use Pckg\Mail\Service\Mail\Adapter\User;
 use Pckg\Mail\Service\Mail\Attachment;
+use Pckg\Mail\Service\Mail\Template\Database;
 use Pckg\Mailo\Swift\Transport\MailoTransport;
 use Swift_Mailer;
 use Swift_MailTransport;
@@ -253,30 +254,40 @@ class Mail
 
     public function template($template, $data = [], $fulldata = [])
     {
-        $email = (new Mails())->where('identifier', $template)->joinFallbackTranslation()->oneOrFail(
-            function() use ($template) {
-                throw new NotFound('Template ' . $template . ' not found');
-            }
-        );
+        /**
+         * Get our template resolver.
+         */
+        $templateResolver = config('pckg.mail.templateResolver', Database::class);
 
-        $subject = (new Twig(null, $data))->setTemplate($fulldata['data']['subject'] ?? $email->subject)->autoparse();
-        $content = (new Twig(null, $data))->setTemplate($fulldata['data']['content'] ?? $email->content)->autoparse();
+        /**
+         * Fetch info from resolver.
+         */
+        [$subject, $content, $email] = (new $templateResolver)->fetchInfo($template, $data, $fulldata);
+
+        $subject = (new Twig(null, $data))->setTemplate($fulldata['data']['subject'] ?? $subject)->autoparse();
+        $content = (new Twig(null, $data))->setTemplate($fulldata['data']['content'] ?? $content)->autoparse();
 
         $data = array_merge(
             $data, [
-                     'subject' => $subject,
-                     'content' => $content,
-                     'type'    => $email->type,
-                     'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
-                 ]
+                'subject' => $subject,
+                'content' => $content,
+                'type' => $email->type,
+                'css' => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
+            ]
         );
         $body = view('Pckg/Mail:layout', $data)->autoparse();
 
+        /**
+         * Set resolved data.
+         */
         $this->body($body)->subject($subject);
 
+        /**
+         * Set mail headers.
+         */
         $this->fromSite();
 
-        if ($email->reply_to) {
+        if ($email && $email->reply_to) {
             $this->replyTo($email->reply_to, (new Site())->getFullName());
         }
 
