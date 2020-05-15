@@ -271,7 +271,7 @@ class Mail
             $data, [
                 'subject' => $subject,
                 'content' => $content,
-                'type' => $email->type,
+                'type' => $email ? $email->type : 'frontend',
                 'css' => class_exists(GetLessVariables::class) ? (new GetLessVariables())->execute() : [],
             ]
         );
