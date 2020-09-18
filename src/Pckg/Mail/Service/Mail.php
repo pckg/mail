@@ -247,7 +247,7 @@ class Mail
 
     public function body($body)
     {
-        $this->mail->setBody($body, 'text/html');
+        $this->mail->setBody($this->transformRelativeUrls($body), 'text/html');
 
         return $this;
     }
@@ -336,6 +336,21 @@ class Mail
         $this->mail->attach(Attachment::fromPath($path, $mimeType)->setFilename($name));
 
         return $this;
+    }
+
+    /**
+     * @param $content
+     * Replace relative sources for images and links with absolute URLs.
+     * https://stackoverflow.com/questions/48836281/replace-all-relative-urls-with-absolute-urls
+     */
+    public function transformRelativeUrls($content)
+    {
+        $url = config('url');
+        if (!$url) {
+            return $content;
+        }
+
+        return preg_replace('~(?:src|href)=[\'"]\K/(?!/)[^\'"]*~', $url . '$0', $content);
     }
 
     public function send(&$failedRecipients = null)
