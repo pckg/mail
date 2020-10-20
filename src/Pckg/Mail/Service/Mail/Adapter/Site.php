@@ -1,6 +1,6 @@
 <?php namespace Pckg\Mail\Service\Mail\Adapter;
 
-class Site extends AbstractAdapter implements Recipient, MultipleRecipients
+class Site extends AbstractAdapter implements MultipleRecipients
 {
 
     public function getFullName()

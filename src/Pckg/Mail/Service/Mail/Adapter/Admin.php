@@ -2,7 +2,7 @@
 
 use Pckg\Collection;
 
-class Admin implements Recipient, MultipleRecipients
+class Admin extends AbstractAdapter implements MultipleRecipients
 {
 
     public function getFullName()

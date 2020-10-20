@@ -2,35 +2,15 @@
 
 use Pckg\Auth\Record\User as UserRecord;
 
-class User extends AbstractAdapter implements Recipient
+class User extends AbstractAdapter
 {
-
-    protected $user;
 
     public function __construct(UserRecord $user)
     {
-        $this->user = $user;
-    }
-
-    public function getFullName()
-    {
-        return $this->user->name . ' ' . $this->user->surname;
-    }
-
-    public function getEmail()
-    {
-        return $this->user->email;
-    }
-
-    public function getLocale()
-    {
-        // @T00D00
-        return $this->user->language_id == 'sl' ? 'sl_SI' : ($this->user->language_id == 'hr' ? 'hr_HR' : 'en_GB');
-    }
-
-    public function getLanguage()
-    {
-        return $this->user->language_id;
+        $this->fullName = trim($user->name . ' ' . $user->surname);
+        $this->email = $user->email ?? null;
+        $this->locale = $user->language_id == 'sl' ? 'sl_SI' : ($user->language_id == 'hr' ? 'hr_HR' : 'en_GB');
+        $this->language = $this->user->language_id ?? null;
     }
 
 }
