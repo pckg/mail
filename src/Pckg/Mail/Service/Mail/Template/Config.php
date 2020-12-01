@@ -9,12 +9,17 @@ class Config
 
     public function fetchInfo($template, $data = [], $fulldata = [])
     {
-        $config = config('pckg.mail.templates.' . $template, null);
+        $config = config('pckg.mail.templates', null);
         if (!$config) {
-            throw new \Exception('Email template is not defined');
+            throw new \Exception('No templates defined in pckg.mail.templates');
         }
 
-        return [$config['subject'], $config['body'], null];
+        $finalConfig = $config[$template] ?? null;
+        if (!$finalConfig) {
+            throw new \Exception('Email template ' . $template . ' is not defined');
+        }
+
+        return [$finalConfig['subject'], $finalConfig['body'], null];
     }
 
 }
