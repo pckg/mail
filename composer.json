@@ -14,7 +14,11 @@
   },
   "require-dev": {
     "pckg-app/frontend-dev": "dev-master",
-    "pckg/framework": "dev-master"
+    "pckg-app/mailo-api": "dev-master",
+    "pckg/framework": "dev-master",
+    "pckg/auth": "dev-master",
+    "pckg/htmlbuilder": "dev-master",
+    "pckg/queue": "dev-master"
   },
   "autoload": {
     "psr-4": {

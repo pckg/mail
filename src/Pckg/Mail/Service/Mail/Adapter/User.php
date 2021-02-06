@@ -12,6 +12,6 @@ class User extends AbstractAdapter
         $this->fullName = trim($user->name . ' ' . $user->surname);
         $this->email = $user->email ?? null;
         $this->locale = $user->language_id == 'sl' ? 'sl_SI' : ($user->language_id == 'hr' ? 'hr_HR' : 'en_GB');
-        $this->language = $this->user->language_id ?? null;
+        $this->language = $user->language_id ?? 'en';
     }
 }

@@ -6,6 +6,11 @@ use Pckg\Database\Record;
 use Pckg\Mail\Entity\Mails;
 use Pckg\Mail\Service\Mail\Adapter\Site;
 
+/**
+ * Class Mail
+ * @package Pckg\Mail\Record
+ * @property string $reply_to
+ */
 class Mail extends Record
 {
 

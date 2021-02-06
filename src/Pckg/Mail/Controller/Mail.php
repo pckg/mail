@@ -133,8 +133,10 @@ class Mail
                 $unique
             ) {
                 $data = [];
+
                 /**
                  * Handle fetches.
+                 * @T00D00 - move to project level
                  */
                 $order = null;
                 if ($receiverType == 'user') {
