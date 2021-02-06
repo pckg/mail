@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Adapter;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Adapter;
 
 use Pckg\Auth\Record\User as UserRecord;
 
@@ -12,5 +14,4 @@ class User extends AbstractAdapter
         $this->locale = $user->language_id == 'sl' ? 'sl_SI' : ($user->language_id == 'hr' ? 'hr_HR' : 'en_GB');
         $this->language = $this->user->language_id ?? null;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service;
+<?php
+
+namespace Pckg\Mail\Service;
 
 use Derive\Layout\Command\GetLessVariables;
 use Exception;
@@ -83,7 +85,7 @@ class Mail
         if (isset($data['fetch'])) {
             foreach ($data['fetch'] as $key => $config) {
                 foreach ($config as $entity => $id) {
-                    $realData[$key] = (new $entity)->where('id', $id)->oneOrFail();
+                    $realData[$key] = (new $entity())->where('id', $id)->oneOrFail();
                     break;
                 }
             }
@@ -134,9 +136,10 @@ class Mail
                 $locale = $language->locale;
             }
             runInLocale(
-                function() use ($template, $realData, $data) {
+                function () use ($template, $realData, $data) {
                     $this->template($template, $realData, $data);
-                }, $locale
+                },
+                $locale
             );
         }
     }
@@ -217,7 +220,8 @@ class Mail
 
         foreach ($emails as $key => $value) {
             $this->mail->addTo(
-                is_int($key) ? $value : $key, is_int($key) && $name ? $name : $value
+                is_int($key) ? $value : $key,
+                is_int($key) && $name ? $name : $value
             );
         }
 
@@ -262,13 +266,14 @@ class Mail
         /**
          * Fetch info from resolver.
          */
-        [$subject, $content, $email] = (new $templateResolver)->fetchInfo($template, $data, $fulldata);
+        [$subject, $content, $email] = (new $templateResolver())->fetchInfo($template, $data, $fulldata);
 
         $subject = (new Twig(null, $data))->setTemplate($fulldata['data']['subject'] ?? $subject)->autoparse();
         $content = (new Twig(null, $data))->setTemplate($fulldata['data']['content'] ?? $content)->autoparse();
 
         $data = array_merge(
-            $data, [
+            $data,
+            [
                 'subject' => $subject,
                 'content' => $content,
                 'type' => $email ? $email->type : 'frontend',
@@ -300,15 +305,17 @@ class Mail
         $content = (new Twig(null, $data))->setTemplate($content)->autoparse();
 
         $body = view(
-            'Pckg/Mail:layout', array_merge(
-                                  $data, [
+            'Pckg/Mail:layout',
+            array_merge(
+                $data,
+                [
                                            'subject' => $subject,
                                            'content' => $content,
                                            'type'    => $data['type'] ?? 'transactional',
                                            'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables(
                                            ))->execute() : [],
                                        ]
-                              )
+            )
         )->autoparse();
 
         $this->body($body)->subject($subject);
@@ -371,5 +378,4 @@ class Mail
     {
         return $this->mailer->getTransport();
     }
-
 }

@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Controller;
+<?php
+
+namespace Pckg\Mail\Controller;
 
 use Derive\Inquiry\Entity\Inquiries;
 use Derive\Inquiry\Record\Inquiry;
@@ -20,13 +22,12 @@ use Pckg\Queue\Record\Queue;
 
 class Mail
 {
-
     use Traits;
 
     public function getMailsAction()
     {
         $type = get('type') == 'newsletter' ? 'newsletter' : 'frontend';
-        
+
         return ['mails' => (new Mails())->where('type', $type)->all()];
     }
 
@@ -119,8 +120,17 @@ class Mail
 
         $uniqueRecipients = [];
         $recipients->each(
-            function($recipient) use (
-                $attachments, $template, $mail, $test, $offersHtml, $receiverType, $type, $recipients, &$uniqueRecipients, $unique
+            function ($recipient) use (
+                $attachments,
+                $template,
+                $mail,
+                $test,
+                $offersHtml,
+                $receiverType,
+                $type,
+                $recipients,
+                &$uniqueRecipients,
+                $unique
             ) {
                 $data = [];
                 /**
@@ -239,7 +249,7 @@ class Mail
     public function getUpsellOfferRecipients($offers)
     {
         return (new Orders())->selectForDataCheck()
-                             ->joinUpsellNotificationLogs(function(HasMany $logs) {
+                             ->joinUpsellNotificationLogs(function (HasMany $logs) {
                                  $logs->leftJoin()->groupBy('orders.id');
                              })
                              ->addSelect([
@@ -263,7 +273,7 @@ class Mail
     public function getTemplateAction(MailRecord $mail)
     {
         return [
-            'mail' => runInLocale(function() use ($mail) {
+            'mail' => runInLocale(function () use ($mail) {
                 return \Pckg\Mail\Record\Mail::gets(['id' => $mail->id]);
             }, $_SESSION['pckg_dynamic_lang_id']),
         ];
@@ -378,7 +388,8 @@ class Mail
                     $data['stat']['unavailable'][] = $to . ' - ' . $line;
                 } elseif (in_array($stat, ['User unknown', 'Unknown'])) {
                     $data['stat']['unknownUser'][] = $to . ' - ' . $line;
-                } elseif (strpos($stat, 'Please try again later') > 0
+                } elseif (
+                    strpos($stat, 'Please try again later') > 0
                           || strpos($stat, 'Please try again later') === 0
                 ) {
                     $data['stat']['later'][] = $to . ' - ' . $line;
@@ -497,5 +508,4 @@ class Mail
             ]
         );
     }
-
 }

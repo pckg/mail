@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Adapter;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Adapter;
 
 class Site extends AbstractAdapter implements MultipleRecipients
 {
@@ -22,5 +24,4 @@ class Site extends AbstractAdapter implements MultipleRecipients
     {
         return config('pckg.locale.language');
     }
-
 }

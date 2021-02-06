@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail;
+<?php
+
+namespace Pckg\Mail\Service\Mail;
 
 use Swift_Attachment;
 use Swift_ByteStream_FileByteStream;
@@ -51,5 +53,4 @@ class Attachment extends Swift_Attachment
     {
         return $this->path;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Provider;
+<?php
+
+namespace Pckg\Mail\Provider;
 
 use Pckg\Framework\Provider;
 use Pckg\Mail\Console\SendMail;
@@ -85,5 +87,4 @@ class Mail extends Provider
     {
         return $this->getViewPaths();
     }
-
 }

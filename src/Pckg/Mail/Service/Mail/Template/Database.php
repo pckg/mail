@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Template;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Template;
 
 use Pckg\Framework\Exception\NotFound;
 use Pckg\Framework\View\Twig;
@@ -17,5 +19,4 @@ class Database
 
         return [$email->subject, $email->content, $email];
     }
-
 }

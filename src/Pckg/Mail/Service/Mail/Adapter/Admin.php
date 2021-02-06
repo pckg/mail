@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Adapter;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Adapter;
 
 use Pckg\Collection;
 
@@ -24,5 +26,4 @@ class Admin extends AbstractAdapter implements MultipleRecipients
     {
         return config('pckg.locale.language');
     }
-
 }

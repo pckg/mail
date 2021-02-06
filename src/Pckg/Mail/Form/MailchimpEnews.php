@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Form;
+<?php
+
+namespace Pckg\Mail\Form;
 
 use Gnp\Old\Form\GnpDecorator;
 use Pckg\Concept\Reflect;
@@ -34,5 +36,4 @@ class MailchimpEnews extends Form implements ResolvesOnRequest
 
         return $this;
     }
-
 }

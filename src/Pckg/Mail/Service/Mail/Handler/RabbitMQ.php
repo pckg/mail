@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Handler;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Handler;
 
 use Pckg\Mail\Service\Mail\HandlerInterface;
 
@@ -9,5 +11,4 @@ class RabbitMQ extends Queue
     {
         return queue()->job('mail:send', $params);
     }
-
 }

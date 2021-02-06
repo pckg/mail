@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Record;
+<?php
+
+namespace Pckg\Mail\Record;
 
 use Pckg\Database\Record;
 use Pckg\Mail\Entity\Mails;
@@ -25,5 +27,4 @@ class Mail extends Record
     {
         return $this->reply_to ?? (new Site())->getEmail();
     }
-
 }

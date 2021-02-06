@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Controller;
+<?php
+
+namespace Pckg\Mail\Controller;
 
 use Derive\Newsletter\Controller\Newsletter;
 use Pckg\Generic\Record\Content;
@@ -20,5 +22,4 @@ class Mailchimp
     {
         return (new Newsletter())->postNewsletterAction();
     }
-
 }

@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Handler;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Handler;
 
 use Pckg\Mail\Console\SendMail;
 use Pckg\Mail\Service\Mail\HandlerInterface;
@@ -26,5 +28,4 @@ class Command implements HandlerInterface
         }
         (new SendMail())->executeManually($params);
     }
-
 }

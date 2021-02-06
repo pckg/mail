@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Adapter;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Adapter;
 
 class SimpleUser extends AbstractAdapter
 {
@@ -15,5 +17,4 @@ class SimpleUser extends AbstractAdapter
     {
         return $this->getLanguage() == 'sl' ? 'sl_SI' : ($this->getLanguage() == 'hr' ? 'hr_HR' : 'en_GB');
     }
-
 }

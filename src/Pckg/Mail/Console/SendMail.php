@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Console;
+<?php
+
+namespace Pckg\Mail\Console;
 
 use Exception;
 use Gnp\Mail\Record\MailsSent;
@@ -28,7 +30,8 @@ class SendMail extends Command
                      'subject'  => 'Mail subject',
                      'campaign' => 'Campaign',
                      'queue'    => 'Queue',
-                 ], InputOption::VALUE_REQUIRED
+                 ],
+                 InputOption::VALUE_REQUIRED
              )
              ->addOptions(
                  [
@@ -196,5 +199,4 @@ class SendMail extends Command
 
         return $this->eventData;
     }
-
 }

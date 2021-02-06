@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Adapter;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Adapter;
 
 interface Recipient
 {
@@ -10,5 +12,4 @@ interface Recipient
     public function getLocale();
 
     public function getLanguage();
-
 }

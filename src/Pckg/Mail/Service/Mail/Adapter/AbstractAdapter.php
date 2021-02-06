@@ -1,4 +1,6 @@
-<?php namespace Pckg\Mail\Service\Mail\Adapter;
+<?php
+
+namespace Pckg\Mail\Service\Mail\Adapter;
 
 abstract class AbstractAdapter implements Recipient
 {
@@ -35,5 +37,4 @@ abstract class AbstractAdapter implements Recipient
     {
         return trim($this->getFullName() . ' <' . $this->getEmail() . '>');
     }
-
 }
