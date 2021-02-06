@@ -369,6 +369,9 @@ class Mail
         return $send;
     }
 
+    /**
+     * @return Swift_Message
+     */
     public function mail()
     {
         return $this->mail;
