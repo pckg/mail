@@ -19,11 +19,11 @@ class Admin extends AbstractAdapter implements MultipleRecipients
 
     public function getLocale()
     {
-        return config('pckg.locale.default');
+        return config('pckg.locale.default', 'en_GB');
     }
 
     public function getLanguage()
     {
-        return config('pckg.locale.language');
+        return config('pckg.locale.language', 'en');
     }
 }

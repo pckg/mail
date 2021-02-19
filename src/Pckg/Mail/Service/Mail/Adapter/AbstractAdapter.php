@@ -20,6 +20,10 @@ abstract class AbstractAdapter implements Recipient
 
     public function getEmail()
     {
+        if (!$this->email) {
+            throw new \Exception('Email is required');
+        }
+
         return $this->email;
     }
 
