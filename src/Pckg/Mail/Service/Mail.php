@@ -13,6 +13,7 @@ use Pckg\Mail\Service\Mail\Adapter\Recipient;
 use Pckg\Mail\Service\Mail\Adapter\Site;
 use Pckg\Mail\Service\Mail\Adapter\User;
 use Pckg\Mail\Service\Mail\Attachment;
+use Pckg\Mail\Service\Mail\Handler\Transaction;
 use Pckg\Mail\Service\Mail\Template\Database;
 use Pckg\Mailo\Swift\Transport\MailoTransport;
 use Swift_Mailer;
@@ -36,10 +37,39 @@ class Mail
      */
     protected $mail;
 
+    const CONFIG_HANDLER = 'pckg.mail.handler';
+
     public function __construct()
     {
         $this->mailer = new Swift_Mailer($this->getTransport());
         $this->reset();
+    }
+
+    /**
+     * @param callable $task
+     * @return null
+     * This is not really a transaction, it just temp-queues emails if the task fails.
+     */
+    public function transaction(callable $task)
+    {
+        $exception = null;
+        $response = null;
+        $previousHandler = config()->get(static::CONFIG_HANDLER);
+
+        try {
+            config()->set(static::CONFIG_HANDLER, Transaction::class);
+
+            return \Pckg\Framework\Helper\forward($task(), function () {
+                Transaction::commit();
+            });
+        } catch (\Throwable $e) {
+            Transaction::rollback();
+            return $e;
+        } finally {
+            config()->set(static::CONFIG_HANDLER, $previousHandler);
+        }
+
+        return $response;
     }
 
     public function reset()
