@@ -3,7 +3,6 @@
 namespace Pckg\Mail\Controller;
 
 use Derive\Newsletter\Controller\Newsletter;
-use Pckg\Generic\Record\Content;
 use Pckg\Generic\Service\Generic\Action;
 use Pckg\Mail\Form\MailchimpEnews;
 
