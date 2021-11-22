@@ -3,7 +3,7 @@
 namespace Pckg\Mail\Console;
 
 use Exception;
-use Gnp\Mail\Record\MailsSent;
+use Derive\Mail\Record\MailsSent;
 use Pckg\Framework\Console\Command;
 use Pckg\Mail\Service\Mail;
 use Pckg\Mailo\Swift\Transport\MailoTransport;
