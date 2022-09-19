@@ -17,6 +17,8 @@ class Transaction implements HandlerInterface
      */
     protected static $queue = [];
 
+    public static $handler = null;
+
     const EVENT_TRANSACTION_ENDED = self::class . '.transactionEnded';
 
     /**
@@ -40,7 +42,8 @@ class Transaction implements HandlerInterface
     static public function commit()
     {
         foreach (static::$queue as $action) {
-            \Pckg\Framework\Helper\resolve($action['handler'])->send($action['template'], $action['receiver'], $action['data']);
+            \Pckg\Framework\Helper\resolve(static::$handler)
+                ->send($action['template'], $action['receiver'], $action['data']);
         }
 
         static::$queue = [];

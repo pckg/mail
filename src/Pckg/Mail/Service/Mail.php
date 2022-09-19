@@ -54,7 +54,7 @@ class Mail
     {
         $exception = null;
         $response = null;
-        $previousHandler = config()->get(static::CONFIG_HANDLER);
+        Transaction::$handler = config()->get(static::CONFIG_HANDLER);
 
         try {
             config()->set(static::CONFIG_HANDLER, Transaction::class);
@@ -63,10 +63,11 @@ class Mail
                 Transaction::commit();
             });
         } catch (\Throwable $e) {
+            error_log('ERROR COMMITTING EMAILS - ' . exception($e));
             Transaction::rollback();
             return $e;
         } finally {
-            config()->set(static::CONFIG_HANDLER, $previousHandler);
+            config()->set(static::CONFIG_HANDLER, Transaction::$handler);
         }
 
         return $response;
@@ -339,12 +340,12 @@ class Mail
             array_merge(
                 $data,
                 [
-                                           'subject' => $subject,
-                                           'content' => $content,
-                                           'type'    => $data['type'] ?? 'transactional',
-                                           'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables(
-                                           ))->execute() : [],
-                                       ]
+                    'subject' => $subject,
+                    'content' => $content,
+                    'type'    => $data['type'] ?? 'transactional',
+                    'css'     => class_exists(GetLessVariables::class) ? (new GetLessVariables(
+                    ))->execute() : [],
+                ]
             )
         )->autoparse();
 
