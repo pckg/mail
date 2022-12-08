@@ -13,7 +13,6 @@ use Pckg\Mail\Service\Mail\Adapter\Site;
  */
 class Mail extends Record
 {
-
     protected $entity = Mails::class;
 
     protected $toArray = ['fromEmail', 'fromName', 'replyToEmail'];

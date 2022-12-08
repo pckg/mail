@@ -8,7 +8,6 @@ use Pckg\Mail\Form\MailchimpEnews;
 
 class Mailchimp
 {
-
     public function getEnewsAction(MailchimpEnews $mailchimpEnewsForm, Action $action)
     {
         return view('Pckg/Mail:mailchimp/newsletter', [

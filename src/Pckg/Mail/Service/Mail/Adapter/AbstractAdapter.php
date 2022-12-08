@@ -4,7 +4,6 @@ namespace Pckg\Mail\Service\Mail\Adapter;
 
 abstract class AbstractAdapter implements Recipient
 {
-
     protected $fullName;
 
     protected $email;

@@ -7,7 +7,6 @@ use Pckg\Mail\Service\Mail\HandlerInterface;
 
 class Command implements HandlerInterface
 {
-
     /**
      * @param       $template
      * @param       $receiver

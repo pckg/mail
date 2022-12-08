@@ -6,7 +6,6 @@ use Pckg\Mail\Service\Mail\HandlerInterface;
 
 class None implements HandlerInterface
 {
-
     public function send($template, $receiver, $data = [])
     {
         return true;

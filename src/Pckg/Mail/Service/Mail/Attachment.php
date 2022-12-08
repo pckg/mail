@@ -9,7 +9,6 @@ use Swift_OutputByteStream;
 
 class Attachment extends Swift_Attachment
 {
-
     protected $path = null;
 
     /**

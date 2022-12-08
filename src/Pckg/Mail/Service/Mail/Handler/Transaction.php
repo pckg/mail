@@ -11,7 +11,6 @@ use Pckg\Mail\Service\Mail\HandlerInterface;
  */
 class Transaction implements HandlerInterface
 {
-
     /**
      * @var array
      */
@@ -39,7 +38,7 @@ class Transaction implements HandlerInterface
     /**
      * Process queued messages.
      */
-    static public function commit()
+    public static function commit()
     {
         foreach (static::$queue as $action) {
             \Pckg\Framework\Helper\resolve(static::$handler)
@@ -52,7 +51,7 @@ class Transaction implements HandlerInterface
     /**
      * Drop queued messages.
      */
-    static public function rollback()
+    public static function rollback()
     {
         static::$queue = [];
     }

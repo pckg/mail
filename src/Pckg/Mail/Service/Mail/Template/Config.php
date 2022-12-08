@@ -8,7 +8,6 @@ use Pckg\Mail\Entity\Mails;
 
 class Config
 {
-
     public function fetchInfo($template, $data = [], $fulldata = [])
     {
         $config = config('pckg.mail.templates', null);

@@ -4,7 +4,6 @@ namespace Pckg\Mail\Service\Mail\Adapter;
 
 class SimpleUser extends AbstractAdapter
 {
-
     public function __construct($email, $name = null, $surname = null, $locale = 'en_GB', $language = 'en')
     {
         $this->fullName = trim($name . ' ' . $surname);

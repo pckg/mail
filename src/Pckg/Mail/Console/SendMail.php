@@ -12,7 +12,6 @@ use Throwable;
 
 class SendMail extends Command
 {
-
     protected $realData = [];
 
     protected $eventData = [];

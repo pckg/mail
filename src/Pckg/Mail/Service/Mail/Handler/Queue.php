@@ -6,7 +6,6 @@ use Pckg\Mail\Service\Mail\HandlerInterface;
 
 class Queue implements HandlerInterface
 {
-
     public function send($template, $receiver, $data = [])
     {
         $params = [

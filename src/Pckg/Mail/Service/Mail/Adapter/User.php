@@ -6,7 +6,6 @@ use Pckg\Auth\Record\User as UserRecord;
 
 class User extends AbstractAdapter
 {
-
     public function __construct(UserRecord $user)
     {
         $this->fullName = trim($user->name . ' ' . $user->surname);

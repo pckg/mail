@@ -9,7 +9,6 @@ use Pckg\Mail\Resolver\Mail as MailResolver;
 
 class Mail extends Provider
 {
-
     public function routes()
     {
         return [

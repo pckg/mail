@@ -6,7 +6,6 @@ use Pckg\Collection;
 
 class Admin extends AbstractAdapter implements MultipleRecipients
 {
-
     public function getFullName()
     {
         return config('site.admin.name');

@@ -26,7 +26,6 @@ use Swift_SmtpTransport;
 
 class Mail
 {
-
     /**
      * @var Swift_Mime_SimpleMessage
      */

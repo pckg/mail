@@ -4,7 +4,6 @@ namespace Pckg\Mail\Service\Mail\Adapter;
 
 class Site extends AbstractAdapter implements MultipleRecipients
 {
-
     public function getFullName()
     {
         return config('site.contact.name');

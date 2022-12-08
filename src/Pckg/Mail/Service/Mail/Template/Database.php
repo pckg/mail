@@ -8,7 +8,6 @@ use Pckg\Mail\Entity\Mails;
 
 class Database
 {
-
     public function fetchInfo($template, $data = [], $fulldata = [])
     {
         $email = (new Mails())->where('identifier', $template)->joinFallbackTranslation()->oneOrFail(

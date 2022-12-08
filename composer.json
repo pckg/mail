@@ -10,14 +10,17 @@
     }
   ],
   "require": {
+    "php": "8.0.*",
     "swiftmailer/swiftmailer": "5.*"
   },
   "require-dev": {
-    "pckg-app/frontend-dev": "dev-master",
+    "pckg-app/frontend-dev": "dev-next-8.0 as dev-master",
     "pckg-app/mailo-api": "dev-master",
-    "pckg/framework": "dev-master",
-    "pckg/auth": "dev-master",
-    "pckg/htmlbuilder": "dev-master",
+    "pckg/framework": "dev-next-8.0 as dev-master",
+    "pckg/auth": "dev-next-8.0 as dev-master",
+    "pckg/htmlbuilder": "dev-next-8.0 as dev-master",
+    "pckg/collection": "dev-next-8.0 as dev-master",
+    "pckg/database": "dev-next-8.0 as dev-master",
     "pckg/queue": "dev-master"
   },
   "autoload": {

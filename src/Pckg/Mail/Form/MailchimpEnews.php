@@ -8,7 +8,6 @@ use Pckg\Htmlbuilder\Element\Form\ResolvesOnRequest;
 
 class MailchimpEnews extends Form implements ResolvesOnRequest
 {
-
     protected $classes = ['form-horizontal'];
 
     public function initFields()
